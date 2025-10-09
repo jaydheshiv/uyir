@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { View, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import PrimaryButton from '../components/PrimaryButton';
 
 type RootStackParamList = {
   GuardianGrantedScreen: undefined;
@@ -23,7 +24,6 @@ const ApprovalStatusChecker: React.FC<Props> = ({ route }) => {
   const [checkCount, setCheckCount] = useState(0);
   const [approved, setApproved] = useState<boolean | null>(null);
 
-
   // Check approval on mount and poll every 5 seconds
   const intervalRef = useRef<number | null>(null);
   useEffect(() => {
@@ -31,7 +31,7 @@ const ApprovalStatusChecker: React.FC<Props> = ({ route }) => {
     const checkApproval = async () => {
       setLoading(true);
       try {
-  const res = await fetch(`http://192.168.1.2:3001/approval-status?email=${encodeURIComponent(route.params.guardianEmail)}`);
+        const res = await fetch(`http://192.168.1.2:3001/approval-status?email=${encodeURIComponent(route.params.guardianEmail)}`);
         const data = await res.json();
         if (data.approved) {
           navigation.replace('GuardianGrantedScreen');
@@ -59,9 +59,8 @@ const ApprovalStatusChecker: React.FC<Props> = ({ route }) => {
     setError('');
     try {
       setCheckCount((prev) => prev + 1);
-  const res = await fetch(`http://192.168.1.2:3001/approval-status?email=${encodeURIComponent(route.params.guardianEmail)}`);
+      const res = await fetch(`http://192.168.1.2:3001/approval-status?email=${encodeURIComponent(route.params.guardianEmail)}`);
       const data = await res.json();
-      console.log('Check Again approval status response:', data);
       if (data.approved) {
         navigation.replace('GuardianGrantedScreen');
         return;
@@ -81,36 +80,70 @@ const ApprovalStatusChecker: React.FC<Props> = ({ route }) => {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#8170FF" />
-        <Text style={{ marginTop: 16 }}>Checking approval status...</Text>
+        <Text style={styles.loadingText}>Checking approval status...</Text>
       </View>
     );
   }
   if (error) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ color: 'red' }}>{error}</Text>
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
       </View>
     );
   }
   // If not approved, show Check Again button and info
   if (approved === false) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ marginBottom: 24 }}>Guardian has not approved yet.</Text>
-        <TouchableOpacity
-          style={{ backgroundColor: '#8170FF', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 24, marginBottom: 12 }}
+      <View style={styles.notApprovedContainer}>
+        <Text style={styles.notApprovedText}>Guardian has not approved yet.</Text>
+        <PrimaryButton
+          title="Check Again"
           onPress={handleCheckAgain}
           disabled={loading}
-        >
-          <Text style={{ color: '#fff', fontSize: 16, fontWeight: '500' }}>Check Again</Text>
-        </TouchableOpacity>
-        <Text style={{ color: '#898A8D', fontSize: 12 }}>Attempts left: {3 - checkCount}</Text>
+          style={styles.checkAgainButton}
+        />
+        <Text style={styles.attemptsText}>Attempts left: {3 - checkCount}</Text>
       </View>
     );
   }
   return null;
 };
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    color: 'red',
+  },
+  notApprovedContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  notApprovedText: {
+    marginBottom: 24,
+  },
+  checkAgainButton: {
+    width: 200,
+    marginBottom: 12,
+  },
+  attemptsText: {
+    color: '#898A8D',
+    fontSize: 12,
+  },
+});
 
 export default ApprovalStatusChecker;

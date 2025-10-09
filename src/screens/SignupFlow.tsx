@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import React, { useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import LabeledInput from '../components/LabeledInput';
+import PrimaryButton from '../components/PrimaryButton';
 
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
@@ -16,10 +17,11 @@ export default function SignupFlow() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState('');
+  const [_username, _setUsername] = useState('');
 
   const handleSignup = async () => {
     if (!email && !phone) {
-  Alert.alert('Validation', 'Please enter email or phone number.');
+      Alert.alert('Validation', 'Please enter email or phone number.');
       return;
     }
     setLoading(true);
@@ -41,80 +43,62 @@ export default function SignupFlow() {
       });
       const data = await response.json();
       if (response.ok) {
-  Alert.alert('Verification', 'Verification code sent successfully!');
+        Alert.alert('Verification', 'Verification code sent successfully!');
         if (email) {
           navigation.navigate('OTPVerificationScreen', { code: data.otp, email });
         } else if (phone) {
           navigation.navigate('OTPVerificationPhoneScreen', { code: data.otp, mobile: phone.startsWith('+91') ? phone : `+91${phone}` });
         }
       } else {
-  Alert.alert('Error', typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail));
+        Alert.alert('Error', typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail));
       }
     } catch (err) {
-  Alert.alert('Network error', 'Please try again later.');
+      Alert.alert('Network error', 'Please try again later.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        paddingHorizontal: 20,
-        marginTop: 32,
-        marginBottom: 12,
-      }}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 32, alignItems: 'flex-start', zIndex: 2 }}>
+    <SafeAreaView style={styles.safeAreaContainer}>
+      <View style={styles.headerContainer}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
-        <View style={{ flex: 1, alignItems: 'center', position: 'absolute', left: 0, right: 0 }}>
-          <Text style={{ fontSize: 18, fontWeight: '400', color: '#000', textAlign: 'center' }}>Sign up</Text>
+        <View style={styles.headerTitleContainer}>
+          <Text style={styles.headerTitle}>Sign up</Text>
         </View>
       </View>
-      <Text style={{
-        fontSize: 18,
-        fontWeight: '700',
-        color: '#000',
-        marginLeft: 20,
-        marginTop: 16,
-        marginBottom: 3,
-      }}>
+      <Text style={styles.subTitle}>
         Create an Uyir account
       </Text>
       <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: 'center',
-          paddingHorizontal: 20,
-          paddingBottom: 32,
-        }}
+        contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={styles.input}
+        {/* Email */}
+        <LabeledInput
+          label="Email"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
-          placeholder=""
+          placeholder="Enter your email"
         />
 
-        <Text style={styles.label}>Password</Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', position: 'relative', height: 48 }}>
-          <TextInput
-            style={[styles.passwordInput, { flex: 1, marginBottom: 0, paddingRight: 36, borderWidth: 0 }]}
+        {/* Password with eye icon inside */}
+        <View style={styles.passwordContainer}>
+          <LabeledInput
+            label="Password"
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!showPassword}
             placeholder="***********"
+            inputStyle={styles.passwordInput}
           />
           <TouchableOpacity
             onPress={() => setShowPassword((prev) => !prev)}
-            style={{ position: 'absolute', right: 10, height: 48, justifyContent: 'center', alignItems: 'center', width: 28 }}
+            style={styles.eyeButton}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <Ionicons
@@ -132,23 +116,26 @@ export default function SignupFlow() {
           <View style={styles.divider} />
         </View>
 
+        {/* Mobile Number */}
         <Text style={styles.label}>Enter Mobile Number</Text>
         <View style={styles.phoneRow}>
           <View style={styles.flagBox}>
             <View style={styles.flagContainer}>
-              <View style={[styles.flagStripe, { backgroundColor: '#FF9933' }]} />
-              <View style={[styles.flagStripe, { backgroundColor: '#fff' }]} />
-              <View style={[styles.flagStripe, { backgroundColor: '#128807' }]} />
+              <View style={[styles.flagStripe, styles.flagStripeOrange]} />
+              <View style={[styles.flagStripe, styles.flagStripeWhite]} />
+              <View style={[styles.flagStripe, styles.flagStripeGreen]} />
               <View style={styles.flagCircle} />
             </View>
           </View>
           <Text style={styles.countryCode}>+91</Text>
-          <TextInput
-            style={styles.phoneInput}
+          <LabeledInput
+            label=""
             value={phone}
             onChangeText={setPhone}
             keyboardType="phone-pad"
             placeholder=""
+            containerStyle={styles.phoneInputContainer}
+            inputStyle={styles.phoneInputStyle}
           />
         </View>
         <Text style={styles.phoneHint}>Enter your mobile number we'll send you a OTP</Text>
@@ -158,21 +145,20 @@ export default function SignupFlow() {
           <Text style={styles.termsLink}>terms and conditions</Text>
         </Text>
 
-        <View style={{ marginTop: 24 }}>
-          <TouchableOpacity
-            style={[styles.sendButton, loading && { opacity: 0.6 }]}
-            disabled={loading}
+        <View style={styles.buttonContainer}>
+          <PrimaryButton
+            title={loading ? 'Sending...' : 'Continue'}
             onPress={handleSignup}
-          >
-            <Text style={styles.sendButtonText}>{loading ? 'Sending...' : 'Continue'}</Text>
-          </TouchableOpacity>
+            disabled={loading}
+            style={styles.primaryButton}
+          />
 
-          <TouchableOpacity style={styles.socialButton}>
+          <TouchableOpacity style={[styles.socialButton, styles.socialButtonSpacing]}>
             <FontAwesome name="google" size={20} color="#8170FF" style={styles.socialIcon} />
             <Text style={styles.socialButtonText}>Continue with Google</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.socialButton}>
+          <TouchableOpacity style={[styles.socialButton, styles.socialButtonLast]}>
             <FontAwesome name="apple" size={22} color="#8170FF" style={styles.socialIcon} />
             <Text style={styles.socialButtonText}>Continue with Apple</Text>
           </TouchableOpacity>
@@ -196,17 +182,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 8,
   },
-  passwordInput: {
-    height: 48,
-    fontSize: 16,
-    backgroundColor: '#fff',
-    paddingHorizontal: 8,
-  },
   passwordHint: { color: '#666', fontSize: 12, marginTop: 4, marginBottom: 8 },
   dividerRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 16 },
   divider: { flex: 1, height: 1, backgroundColor: '#000' },
   orText: { marginHorizontal: 12, color: '#000', fontSize: 16 },
-  phoneRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  phoneRow: { flexDirection: 'row', alignItems: 'flex-end', marginBottom: 8 },
   flagBox: {
     width: 48,
     height: 48,
@@ -218,7 +198,7 @@ const styles = StyleSheet.create({
     marginRight: 4,
     backgroundColor: '#fff',
   },
-  countryCode: { fontSize: 16, color: '#A8A8A8', marginRight: 4, alignSelf: 'center' },
+  countryCode: { fontSize: 16, color: '#A8A8A8', marginRight: 4, alignSelf: 'flex-end', paddingBottom: 12 },
   phoneInput: {
     flex: 1,
     height: 48,
@@ -268,5 +248,95 @@ const styles = StyleSheet.create({
     color: '#8170FF',
     fontSize: 16,
     fontWeight: '500',
+  },
+  // New styles for alignment fixes
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingHorizontal: 20,
+    marginTop: 22,
+    marginBottom: 12,
+  },
+  backButton: {
+    width: 32,
+    alignItems: 'flex-start',
+    zIndex: 2,
+  },
+  headerTitleContainer: {
+    flex: 1,
+    alignItems: 'center',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '400',
+    color: '#000',
+    textAlign: 'center',
+  },
+  subTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#000',
+    marginLeft: 20,
+    marginTop: 12,
+    marginBottom: 18,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 32,
+  },
+  passwordContainer: {
+    position: 'relative',
+    marginBottom: 8,
+  },
+  passwordInput: {
+    paddingRight: 36,
+  },
+  eyeButton: {
+    position: 'absolute',
+    right: 12,
+    top: 38,
+    height: 32,
+    width: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  flagStripeOrange: {
+    backgroundColor: '#FF9933',
+  },
+  flagStripeWhite: {
+    backgroundColor: '#fff',
+  },
+  flagStripeGreen: {
+    backgroundColor: '#128807',
+  },
+  phoneInputContainer: {
+    flex: 1,
+    marginBottom: 0,
+  },
+  phoneInputStyle: {
+    height: 48,
+    marginBottom: 0,
+  },
+  buttonContainer: {
+    marginTop: 4,
+  },
+  primaryButton: {
+    marginBottom: 16,
+  },
+  socialButtonSpacing: {
+    marginBottom: 16,
+  },
+  socialButtonLast: {
+    marginBottom: 0,
   },
 });

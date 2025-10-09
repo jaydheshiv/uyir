@@ -1,22 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Platform, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { Image, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import PrimaryButton from '../components/PrimaryButton';
 
 const avatars = [
   {
     id: 1,
-  image: require('../assets/avatar-male.png'),
+    image: require('../assets/avatar-male.png'),
     alt: 'Male avatar option',
   },
   {
     id: 2,
-  image: require('../assets/avatar-female.png'),
+    image: require('../assets/avatar-female.png'),
     alt: 'Female avatar option',
   },
 ];
 
 const DefaultAvatar: React.FC = () => {
-  const navigation = useNavigation();
   const [selectedAvatar, setSelectedAvatar] = useState<number | null>(1);
 
   return (
@@ -40,14 +39,12 @@ const DefaultAvatar: React.FC = () => {
       </View>
       {/* Next Button */}
       <View style={styles.bottomSection}>
-        <TouchableOpacity
-          style={[styles.nextButton, !selectedAvatar && styles.nextButtonDisabled]}
+        <PrimaryButton
+          title="Next"
+          onPress={() => {/* handle next */ }}
           disabled={!selectedAvatar}
-          onPress={() => {/* handle next */}}
-        >
-          <Text style={styles.nextButtonText}>Next</Text>
-        </TouchableOpacity>
-
+          style={styles.nextButtonSpacing}
+        />
       </View>
     </SafeAreaView>
   );
@@ -55,24 +52,6 @@ const DefaultAvatar: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
-  statusBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    height: 54,
-    paddingHorizontal: 24,
-    paddingTop: Platform.OS === 'ios' ? 0 : 8,
-    backgroundColor: '#fff',
-  },
-  statusTime: { fontSize: 17, fontWeight: '600', color: '#000' },
-  statusIcons: { flexDirection: 'row', alignItems: 'center' },
-  signalBars: { flexDirection: 'row', alignItems: 'flex-end', marginRight: 8 },
-  signalBar: {
-    width: 4,
-    backgroundColor: '#000',
-    borderRadius: 2,
-    marginRight: 2,
-  },
   content: {
     flex: 1,
     paddingHorizontal: 24,
@@ -123,32 +102,8 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     backgroundColor: '#fff',
   },
-  nextButton: {
-    width: '100%',
-    height: 56,
-    backgroundColor: '#8170FF',
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
+  nextButtonSpacing: {
     marginBottom: 16,
-  },
-  nextButtonDisabled: {
-    opacity: 0.5,
-  },
-  nextButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  homeIndicatorContainer: {
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  homeIndicator: {
-    width: 139,
-    height: 5,
-    backgroundColor: '#000',
-    borderRadius: 2.5,
   },
 });
 

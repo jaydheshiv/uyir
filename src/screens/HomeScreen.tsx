@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const COLORS = {
   white: '#fff',
@@ -22,14 +22,12 @@ const FONT_SIZES = {
 const Button = ({ title, onPress, variant }: { title: string; onPress: () => void; variant?: string }) => (
   <TouchableOpacity
     onPress={onPress}
-    style={{
-      backgroundColor: variant === 'primary' ? COLORS.black : COLORS.gray,
-      padding: SPACING.md,
-      borderRadius: 8,
-      alignItems: 'center',
-    }}
+    style={[
+      styles.button,
+      { backgroundColor: variant === 'primary' ? COLORS.black : COLORS.gray }
+    ]}
   >
-    <Text style={{ color: COLORS.white, fontSize: FONT_SIZES.md }}>{title}</Text>
+    <Text style={styles.buttonText}>{title}</Text>
   </TouchableOpacity>
 );
 
@@ -44,7 +42,7 @@ const HomeScreen: React.FC = () => {
       <Text style={styles.subtitle}>
         Your React Native app is ready to go.
       </Text>
-      
+
       <View style={styles.buttonContainer}>
         <Button
           title="Get Started"
@@ -80,6 +78,15 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
     maxWidth: 200,
+  },
+  button: {
+    padding: SPACING.md,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: COLORS.white,
+    fontSize: FONT_SIZES.md,
   },
 });
 

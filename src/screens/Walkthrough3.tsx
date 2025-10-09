@@ -1,10 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import Feather from 'react-native-vector-icons/Feather';
-
-const { width } = Dimensions.get('window');
+import React from 'react';
+import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 const BACKGROUND_IMAGE = { uri: 'https://api.builder.io/api/v1/image/assets/TEMP/3393aabd72af06c819d2ddafc11e7613855f2476?width=786' };
 
 type RootStackParamList = {
@@ -61,9 +58,9 @@ const Walkthrough3 = () => {
 };
 
 const styles = StyleSheet.create({
-	background: { 
-		flex: 1, 
-		justifyContent: 'flex-end' 
+	background: {
+		flex: 1,
+		justifyContent: 'flex-end'
 	},
 	overlay: {
 		...StyleSheet.absoluteFillObject,

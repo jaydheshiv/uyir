@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import Svg, { Path, Circle } from 'react-native-svg';
+import React from 'react';
+import { Dimensions, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Svg, { Circle, Path } from 'react-native-svg';
 import Feather from 'react-native-vector-icons/Feather';
 
 const { width } = Dimensions.get('window');
@@ -57,7 +57,7 @@ const Walkthrough2 = () => {
 						<Feather name="camera" size={32} color="rgba(255,255,255,0.7)" />
 					</View>
 					{/* Birthday Card */}
-					<View style={[styles.timelineCard, { marginTop: -16 }]}> 
+					<View style={[styles.timelineCard, styles.birthdayCardMargin]}>
 						<Feather name="gift" size={32} color="rgba(255,255,255,0.7)" />
 					</View>
 					{/* Profile Card (featured) */}
@@ -233,6 +233,9 @@ const styles = StyleSheet.create({
 		color: '#fff',
 		fontSize: 16,
 		fontWeight: '600',
+	},
+	birthdayCardMargin: {
+		marginTop: -16,
 	},
 });
 

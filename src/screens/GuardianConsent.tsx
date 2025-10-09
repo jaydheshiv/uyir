@@ -1,9 +1,12 @@
 // @ts-ignore
 declare var alert: (message?: any) => void;
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import React, { useState } from 'react';
+import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import BackButton from '../components/BackButton';
+import LabeledInput from '../components/LabeledInput';
+import PrimaryButton from '../components/PrimaryButton';
 
 type RootStackParamList = {
   Splash: undefined;
@@ -16,16 +19,10 @@ type RootStackParamList = {
   Home: undefined;
   BasicDetails: undefined;
   GuardianConsent: undefined;
-  WelcomeBackScreen: undefined;
   ApprovalStatusChecker: { guardianEmail: string };
 };
 
 type GuardianConsentNavigationProp = StackNavigationProp<RootStackParamList, 'GuardianConsent'>;
-
-// Arrow Left Icon Component
-const ArrowLeftIcon = () => (
-  <Text style={styles.backArrow}>←</Text>
-);
 
 // Chevron Down Icon Component
 const ChevronDownIcon = () => (
@@ -66,12 +63,12 @@ const GuardianConsent: React.FC = () => {
       setError('Please select the relation.');
       return;
     }
-  setLoading(true);
-  console.log('Email entered in app:', contact);
-  const consent_link = `http://192.168.1.2:3001/consent-approval.html?email=${encodeURIComponent(contact)}`;
-  console.log('Consent link sent in email:', consent_link);
+    setLoading(true);
+    console.log('Email entered in app:', contact);
+    const consent_link = `http://192.168.1.2:3001/consent-approval.html?email=${encodeURIComponent(contact)}`;
+    console.log('Consent link sent in email:', consent_link);
     try {
-  const response = await fetch('http://192.168.1.2:3001/send-consent', {
+      const response = await fetch('http://192.168.1.2:3001/send-consent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -83,8 +80,8 @@ const GuardianConsent: React.FC = () => {
       if (response.ok) {
         setLoading(false);
         alert('Consent email sent to guardian!');
-  console.log('Navigating to ApprovalStatusChecker with email:', contact);
-  navigation.navigate('ApprovalStatusChecker', { guardianEmail: contact });
+        console.log('Navigating to ApprovalStatusChecker with email:', contact);
+        navigation.navigate('ApprovalStatusChecker', { guardianEmail: contact });
       } else {
         setLoading(false);
         setError('Failed to send email. Please try again.');
@@ -102,9 +99,7 @@ const GuardianConsent: React.FC = () => {
         {/* Main Content */}
         <View style={styles.content}>
           {/* Back Arrow */}
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <ArrowLeftIcon />
-          </TouchableOpacity>
+          <BackButton onPress={() => navigation.goBack()} />
 
           {/* Title and Subtitle */}
           <View style={styles.titleSection}>
@@ -115,32 +110,24 @@ const GuardianConsent: React.FC = () => {
           {/* Form Fields */}
           <View style={styles.formSection}>
             {/* Guardian's Full Name */}
-            <View style={styles.fieldContainer}>
-              <Text style={styles.label}>Guardian's Full Name</Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  fullName !== '' ? styles.inputFilled : styles.inputEmpty
-                ]}
-                value={fullName}
-                onChangeText={setFullName}
-                placeholder=""
-                autoCapitalize="words"
-              />
-            </View>
+            <LabeledInput
+              label="Guardian's Full Name"
+              value={fullName}
+              onChangeText={setFullName}
+              placeholder="Enter guardian's name"
+              containerStyle={styles.guardianInputSpacing}
+            />
 
             {/* Guardian's Phone Number/Email */}
-            <View style={styles.fieldContainer}>
-              <Text style={styles.label}>Guardian's Phone Number/Email</Text>
-              <TextInput
-                style={[styles.input, styles.inputFilled]}
-                value={contact}
-                onChangeText={setContact}
-                placeholder=""
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            </View>
+            <LabeledInput
+              label="Guardian's Phone Number/Email"
+              value={contact}
+              onChangeText={setContact}
+              placeholder="Enter phone or email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              containerStyle={styles.guardianInputSpacing}
+            />
 
             {/* Relation Dropdown */}
             <View style={styles.fieldContainer}>
@@ -199,21 +186,12 @@ const GuardianConsent: React.FC = () => {
         ) : null}
 
         {/* Send Consent Form Button */}
-        <TouchableOpacity
-          style={[styles.sendButton, loading && { opacity: 0.6 }]}
+        <PrimaryButton
+          title={loading ? 'Sending...' : 'Send Consent Form'}
           onPress={handleSendConsentForm}
           disabled={loading}
-        >
-          <Text style={styles.sendButtonText}>
-            {loading ? 'Sending...' : 'Send Consent Form'}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Home Indicator */}
-        <View style={styles.homeIndicator}>
-          <View style={styles.homeIndicatorBar} />
-        </View>
-  </View>
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -228,10 +206,10 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingTop: 70,
   },
   backButton: {
-    marginBottom: 24,
+    marginBottom: 10,
     width: 32,
     height: 32,
     justifyContent: 'center',
@@ -242,7 +220,8 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   titleSection: {
-    marginBottom: 32,
+    marginBottom: 40,
+    marginTop: 30, // Add this line to push the title and subtitle down
   },
   title: {
     fontSize: 24,
@@ -270,7 +249,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 48,
     paddingHorizontal: 16,
-    borderRadius: 8,
+    borderRadius: 18,
     fontSize: 16,
     color: '#000',
     backgroundColor: '#fff',
@@ -289,7 +268,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 48,
     paddingHorizontal: 16,
-    borderRadius: 8,
+    borderRadius: 18,
     backgroundColor: '#fff',
     borderWidth: 1,
     flexDirection: 'row',
@@ -391,6 +370,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 12,
     textAlign: 'center',
+  },
+  guardianInputSpacing: {
+    marginBottom: 20,
   },
 });
 

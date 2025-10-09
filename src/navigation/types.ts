@@ -12,4 +12,5 @@ export type RootStackParamList = {
   BasicDetails: undefined;
   GuardianConsent: undefined;
   SignupFlow: undefined;
+  Invite: undefined;
 };

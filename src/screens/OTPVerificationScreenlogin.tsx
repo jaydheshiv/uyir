@@ -1,12 +1,11 @@
-// @ts-ignore
-declare var alert: (message?: any) => void;
-import React, { useRef, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import React, { useState } from 'react';
+import { Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import OTPInput from '../components/OTPInput';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 
 
 
@@ -14,25 +13,7 @@ const OTPVerificationScreenlogin: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const route = useRoute();
   const { code, email, mobile } = (route.params || {}) as { code?: string; email?: string; mobile?: string };
-  const codeArray = code && code.length === 4 ? code.split('') : ['', '', '', ''];
-  const [otp, setOtp] = useState<string[]>(codeArray);
-  const inputs = [useRef(null), useRef(null), useRef(null), useRef(null)];
-
-  const handleChange = (text: string, idx: number) => {
-    if (/^\d?$/.test(text)) {
-      const newOtp = [...otp];
-      newOtp[idx] = text;
-      setOtp(newOtp);
-      if (text && idx < 3) {
-        // @ts-ignore
-        inputs[idx + 1].current.focus();
-      }
-      if (!text && idx > 0) {
-        // @ts-ignore
-        inputs[idx - 1].current.focus();
-      }
-    }
-  };
+  const [otp, setOtp] = useState<string>(code && code.length === 4 ? code : '');
 
   const handleResend = async () => {
     try {
@@ -50,19 +31,19 @@ const OTPVerificationScreenlogin: React.FC = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        alert('OTP resent successfully!');
+        Alert.alert('OTP resent successfully!');
       } else {
-        alert(typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail));
+        Alert.alert(typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail));
       }
     } catch (err) {
-      alert('Network error.');
+      Alert.alert('Network error.');
     }
   };
 
   const handleVerify = async () => {
-    const entered = otp.join('');
+    const entered = otp;
     if (entered.length !== 4) {
-      alert('Please enter the 4-digit code.');
+      Alert.alert('Please enter the 4-digit code.');
       return;
     }
     try {
@@ -83,10 +64,10 @@ const OTPVerificationScreenlogin: React.FC = () => {
       if (response.ok) {
         navigation.navigate('GrantedScreen');
       } else {
-        alert(data.detail || 'Incorrect code. Please try again.');
+        Alert.alert(data.detail || 'Incorrect code. Please try again.');
       }
     } catch (err) {
-      alert('Network error.');
+      Alert.alert('Network error.');
     }
   };
 
@@ -97,28 +78,9 @@ const OTPVerificationScreenlogin: React.FC = () => {
         <Ionicons name="chevron-back" size={24} color="#000" />
       </TouchableOpacity>
       <Text style={styles.title}>Enter Code</Text>
-      <View style={styles.otpRow}>
-        {otp.map((digit, idx) => (
-          <TextInput
-            key={idx}
-            ref={inputs[idx]}
-            style={styles.otpInput}
-            value={digit}
-            onChangeText={text => handleChange(text, idx)}
-            keyboardType="number-pad"
-            maxLength={1}
-            returnKeyType="done"
-            autoFocus={idx === 0 && digit === ''}
-            onFocus={() => {
-              const newOtp = [...otp];
-              if (!newOtp[idx]) newOtp[idx] = '';
-              setOtp(newOtp);
-            }}
-          />
-        ))}
-      </View>
+      <OTPInput value={otp} onChange={setOtp} length={4} />
       <Text style={styles.helperText}>Enter the 4-Digit code we sent to your Email</Text>
-      <View style={{ flex: 1 }} />
+      <View style={styles.spacer} />
       <View style={styles.resendRow}>
         <Text style={styles.resendText}>Didn't get OTP? </Text>
         <TouchableOpacity onPress={handleResend}>
@@ -142,7 +104,7 @@ const styles = StyleSheet.create({
   backButton: {
     position: 'absolute',
     top: 60,
-    left: 24,
+    left: 17,
     zIndex: 10,
     backgroundColor: 'transparent',
     padding: 8,
@@ -211,6 +173,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 20,
     fontWeight: '600',
+  },
+  spacer: {
+    flex: 1,
   },
 });
 

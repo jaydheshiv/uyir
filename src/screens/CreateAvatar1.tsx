@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Platform, ScrollView, Modal } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import React, { useState } from 'react';
+import { Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import BackButton from '../components/BackButton';
+import PrimaryButton from '../components/PrimaryButton';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import Learnmore from './Learnmore';
 
@@ -31,92 +33,227 @@ const avatarTypes = [
 ];
 
 const CreateAvatar1: React.FC = () => {
-
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const [selectedImages, setSelectedImages] = useState<{[key: string]: string | null}>(
+  const [selectedImages, setSelectedImages] = useState<{ [key: string]: string | null }>(
     { happy: null, calm: null, reflective: null, intense: null }
   );
   const [showLearnMore, setShowLearnMore] = useState(false);
+  const [currentAvatarType, _setCurrentAvatarType] = useState(0);
 
-  const handleImageUpload = (type: string) => {
+  const handleImageUpload = (_type: string) => {
     setShowLearnMore(true);
   };
+
+  const handleLearnMoreDone = () => {
+    // Add a sample image when Done is clicked
+    const currentType = avatarTypes[currentAvatarType];
+    const sampleImageUrl = 'https://media.istockphoto.com/id/1477871619/photo/portrait-of-happy-businesswoman-arms-crossed-looking-at-camera-on-white-background-stock-photo.jpg?s=612x612&w=0&k=20&c=vH666X9xpurnAfKaxvHE43O-b0WxmF4_VpOfALsg0PY=';
+
+    setSelectedImages(prev => ({
+      ...prev,
+      [currentType.id]: sampleImageUrl
+    }));
+
+    // Close the modal
+    setShowLearnMore(false);
+  };
+
+  // Check if at least one image is selected
+  const isAnyImageSelected = Object.values(selectedImages).some((img) => !!img);
+
+  const currentType = avatarTypes[currentAvatarType];
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerRow}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: 8 }}>
-          <Ionicons name="chevron-back" size={20} color="#000" />
-        </TouchableOpacity>
+        <BackButton onPress={() => navigation.goBack()} />
       </View>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={{ marginTop: 15, marginBottom:5, paddingHorizontal: 24 }}>
+      <View style={styles.content}>
+        <View style={styles.headerContainer}>
           <Text style={styles.title}>Add photos to create your avatar</Text>
           <Text style={styles.subtitle}>This improves your avatar’s expressiveness</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => setShowLearnMore(true)}>
             <Text style={styles.learnMore}>Learn more</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.avatarList}>
-          {avatarTypes.map((type) => (
-            <View key={type.id} style={styles.avatarCard}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.avatarText}>{type.text}</Text>
-              </View>
-              <TouchableOpacity
-                onPress={() => handleImageUpload(type.id)}
-                style={styles.imageUploadButton}
-                activeOpacity={0.7}
-              >
-                {selectedImages[type.id] ? (
-                  <Image source={{ uri: selectedImages[type.id] || undefined }} style={styles.avatarImage} />
-                ) : (
-                  <View style={styles.plusCircle}><Ionicons name="add" size={20} color="#fff" /></View>
-                )}
-              </TouchableOpacity>
-            </View>
-          ))}
+        <View style={styles.avatarCardContainer}>
+          <View style={styles.avatarCard}>
+            <TouchableOpacity
+              onPress={() => handleImageUpload(currentType.id)}
+              style={styles.imageUploadButton}
+              activeOpacity={0.7}
+            >
+              {selectedImages[currentType.id] ? (
+                <Image source={{ uri: selectedImages[currentType.id] || undefined }} style={styles.avatarImage} />
+              ) : (
+                <View style={styles.uploadPlaceholder}>
+                  <View style={styles.dashedBorder} />
+                  <View style={styles.plusCircle}>
+                    <Ionicons name="add" size={20} color="#fff" />
+                  </View>
+                </View>
+              )}
+            </TouchableOpacity>
+            <Text style={styles.avatarText}>{currentType.text}</Text>
+          </View>
         </View>
         <View style={styles.bottomButtons}>
-          <TouchableOpacity
-            style={styles.continueButton}
-            disabled={true}
-          >
-            <Text style={styles.continueButtonText}>Continue</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.defaultButton} onPress={() => navigation.navigate('DefaultAvatar')}>
-            <Text style={styles.defaultButtonText}>Use default avatar</Text>
+          <PrimaryButton
+            title="Continue"
+            onPress={() => navigation.navigate('CreateAccount')}
+            style={styles.continueButtonSpacing}
+            disabled={!isAnyImageSelected}
+          />
+          <TouchableOpacity onPress={() => navigation.navigate('DefaultAvatar')}>
+            <Text style={styles.defaultAvatarText}>
+              Use default avatar
+            </Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      </View>
       <Modal visible={showLearnMore} animationType="slide" transparent>
-        <Learnmore onDone={() => {
-          setShowLearnMore(false);
-          navigation.navigate({ name: 'CreateAvathar2', params: undefined });
-        }} />
+        <Learnmore
+          onClose={() => setShowLearnMore(false)}
+          onDone={handleLearnMoreDone}
+          nextScreen="CreateAccount"
+        />
       </Modal>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  scrollContent: { padding: 0, paddingBottom: 24 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 12, marginBottom: 10, paddingHorizontal: 24 },
-  title: { fontSize: 22, fontWeight: '700', color: '#000', marginBottom: 8, fontFamily: 'Outfit' },
-  subtitle: { fontSize: 16, color: '#000', marginBottom: 4, fontFamily: 'Outfit' },
-  learnMore: { color: '#8170FF', fontSize: 15, textDecorationLine: 'underline', marginTop: 2 },
-  avatarList: { marginTop: 16, paddingHorizontal: 20 },
-  avatarCard: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#8170FF', borderRadius: 22, backgroundColor: '#fff', padding: 16, marginBottom: 20, borderStyle: 'solid', minHeight: 96 },
-  avatarText: { fontSize: 15, color: '#000', fontWeight: '500', textAlign: 'left' },
-  imageUploadButton: { width: 80, height: 80, borderWidth: 2, borderStyle: 'dashed', borderColor: '#8170FF', backgroundColor: '#EDEBFA', borderRadius: 16, justifyContent: 'center', alignItems: 'center', position: 'relative' },
-  plusCircle: { position: 'absolute', bottom: 6, right: 6, width: 28, height: 28, borderRadius: 14, backgroundColor: '#8170FF', justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#fff' },
-  avatarImage: { width: 76, height: 76, borderRadius: 14, resizeMode: 'cover' },
-  bottomButtons: { marginTop: 20, paddingHorizontal: 20, marginBottom: 4 },
-  continueButton: { width: '100%', paddingVertical: 18, backgroundColor: '#888', borderRadius: 35, alignItems: 'center', marginBottom: 18 },
-  continueButtonText: { color: '#fff', fontSize: 18, fontWeight: '500' },
-  defaultButton: { width: '100%', paddingVertical: 18, borderRadius: 35, alignItems: 'center', backgroundColor: '#fff', marginTop: -19 },
-  defaultButtonText: { color: '#8170FF', fontSize: 17, fontWeight: '500'},
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingBottom: 24
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    marginTop: 12,
+    marginBottom: 10,
+    paddingLeft: 18,
+  },
+  headerContainer: {
+    marginTop: 20,
+    marginBottom: 40,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#000',
+    marginBottom: 8,
+    fontFamily: 'Outfit'
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#000',
+    marginBottom: 4,
+    fontFamily: 'Outfit'
+  },
+  learnMore: {
+    color: '#8170FF',
+    fontSize: 15,
+    textDecorationLine: 'underline',
+    marginTop: 2
+  },
+  avatarCardContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  avatarCard: {
+    width: '100%',
+    maxWidth: 400,
+    borderWidth: 1,
+    borderColor: '#000',
+    borderRadius: 24,
+    backgroundColor: '#fff',
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 300,
+  },
+  imageUploadButton: {
+    width: 120,
+    height: 120,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    backgroundColor: 'transparent',
+  },
+  uploadPlaceholder: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  dashedBorder: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: '#8170FF',
+    borderRadius: 16,
+    backgroundColor: '#F5F5F5',
+  },
+  plusCircle: {
+    position: 'absolute',
+    bottom: -5,
+    right: -5,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#8170FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  avatarImage: {
+    width: 116,
+    height: 116,
+    borderRadius: 14,
+    resizeMode: 'cover'
+  },
+  avatarText: {
+    fontSize: 16,
+    color: '#000',
+    fontWeight: '400',
+    textAlign: 'center',
+    lineHeight: 24,
+    maxWidth: 280,
+  },
+  bottomButtons: {
+    paddingTop: 20,
+    gap: 12,
+  },
+  continueButtonSpacing: {
+    width: '100%',
+  },
+  defaultAvatarText: {
+    color: '#8170FF',
+    fontSize: 17,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
 });
 
 export default CreateAvatar1;

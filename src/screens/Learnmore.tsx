@@ -1,5 +1,7 @@
+import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions } from 'react-native';
+import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -16,62 +18,84 @@ const badPhotos = [
 	'https://images.unsplash.com/photo-1673404905144-43308715e581?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDJ8fGJhZCUyMHBvc2luZyUyMHBob3Rvc3xlbnwwfHwwfHx8MA%3D%3D',
 ];
 
-interface LearnmoreProps {
-	onDone: () => void;
-}
+type RootStackParamList = {
+	CreateAccount: undefined;
+	CreateAvatar3: undefined;
+	CreateAvatar4: undefined;
+	AccountGranted: undefined;
+	Upload: undefined;
+	// ...other screens
+};
 
-const Learnmore: React.FC<LearnmoreProps> = ({ onDone }) => {
+type LearnMoreProps = {
+	onClose: () => void;
+	onDone?: () => void;
+	nextScreen?: keyof RootStackParamList; // Add this prop
+};
+
+const LearnMore: React.FC<LearnMoreProps> = ({ onClose: _onClose, onDone, nextScreen }) => {
+	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+
 	return (
 		<View style={styles.root}>
 			{/* Overlay */}
 			<View style={styles.overlay} />
 			{/* Modal Card */}
-							<View style={styles.modalCard}>
-								<View style={styles.innerCard}>
-									<ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-										<Text style={styles.header}>Photo Requirements</Text>
-										{/* Good Photos */}
-										<View style={styles.sectionRow}>
-											<View style={styles.iconCircleGreen}>
-												<Text style={styles.iconCheck}>✓</Text>
-											</View>
-											<Text style={styles.sectionTitleGood}>Good Photos</Text>
-										</View>
-										<Text style={styles.sectionDesc}>
-											Recent photos of yourself (just you), showing a mix of close-ups and full-body shots, with different angles, expressions (smiling, neutral, serious), and a variety of outfits. Make sure they are High-resolution and reflect your current appearance.
-										</Text>
-										<View style={styles.photoRow}>
-											{goodPhotos.map((img, idx) => (
-												<View key={idx} style={styles.photoContainer}>
-													<Image source={{ uri: img }} style={styles.photoImg} />
-													<View style={styles.checkCircle}><Text style={styles.checkMark}>✓</Text></View>
-												</View>
-											))}
-										</View>
-										{/* Bad Photos */}
-										<View style={[styles.sectionRow, { marginTop: 24 }]}> 
-											<View style={styles.iconCircleRed}>
-												<Text style={styles.iconCross}>✕</Text>
-											</View>
-											<Text style={styles.sectionTitleBad}>Bad Photos</Text>
-										</View>
-										<Text style={styles.sectionDesc}>
-											No group photos, hats, sunglasses, pets, heavy filters, low-resolution images, or screenshots. Avoid photos that are too old, overly edited, or don't represent how you currently look.
-										</Text>
-										<View style={styles.photoRow}>
-											{badPhotos.map((img, idx) => (
-												<View key={idx} style={styles.photoContainer}>
-													<Image source={{ uri: img }} style={styles.photoImg} />
-													<View style={styles.crossCircle}><Text style={styles.crossMark}>✕</Text></View>
-												</View>
-											))}
-										</View>
-									</ScrollView>
-								</View>
-								<TouchableOpacity style={styles.doneBtn} onPress={onDone}>
-									<Text style={styles.doneBtnText}>Done</Text>
-								</TouchableOpacity>
+			<View style={styles.modalCard}>
+				<View style={styles.innerCard}>
+					<ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+						<Text style={styles.header}>Photo Requirements</Text>
+						{/* Good Photos */}
+						<View style={styles.sectionRow}>
+							<View style={styles.iconCircleGreen}>
+								<Text style={styles.iconCheck}>✓</Text>
 							</View>
+							<Text style={styles.sectionTitleGood}>Good Photos</Text>
+						</View>
+						<Text style={styles.sectionDesc}>
+							Recent photos of yourself (just you), showing a mix of close-ups and full-body shots, with different angles, expressions (smiling, neutral, serious), and a variety of outfits. Make sure they are High-resolution and reflect your current appearance.
+						</Text>
+						<View style={styles.photoRow}>
+							{goodPhotos.map((img, idx) => (
+								<View key={idx} style={styles.photoContainer}>
+									<Image source={{ uri: img }} style={styles.photoImg} />
+									<View style={styles.checkCircle}><Text style={styles.checkMark}>✓</Text></View>
+								</View>
+							))}
+						</View>
+						{/* Bad Photos */}
+						<View style={[styles.sectionRow, styles.sectionRowSpaced]}>
+							<View style={styles.iconCircleRed}>
+								<Text style={styles.iconCross}>✕</Text>
+							</View>
+							<Text style={styles.sectionTitleBad}>Bad Photos</Text>
+						</View>
+						<Text style={styles.sectionDesc}>
+							No group photos, hats, sunglasses, pets, heavy filters, low-resolution images, or screenshots. Avoid photos that are too old, overly edited, or don't represent how you currently look.
+						</Text>
+						<View style={styles.photoRow}>
+							{badPhotos.map((img, idx) => (
+								<View key={idx} style={styles.photoContainer}>
+									<Image source={{ uri: img }} style={styles.photoImg} />
+									<View style={styles.crossCircle}><Text style={styles.crossMark}>✕</Text></View>
+								</View>
+							))}
+						</View>
+					</ScrollView>
+				</View>
+				<TouchableOpacity
+					style={styles.doneBtn}
+					onPress={() => {
+						if (onDone) {
+							onDone();
+						} else if (nextScreen) {
+							navigation.navigate(nextScreen);
+						}
+					}}
+				>
+					<Text style={styles.doneBtnText}>Done</Text>
+				</TouchableOpacity>
+			</View>
 			{/* Home Indicator removed as requested */}
 		</View>
 	);
@@ -261,7 +285,10 @@ const styles = StyleSheet.create({
 		paddingVertical: 4,
 		paddingHorizontal: 8,
 	},
-		// homeIndicator styles removed
+	sectionRowSpaced: {
+		marginTop: 24,
+	},
+	// homeIndicator styles removed
 });
 
-export default Learnmore;
+export default LearnMore;

@@ -15,7 +15,7 @@ type RootStackParamList = {
   Home: undefined;
   BasicDetails: undefined;
   GuardianConsent: undefined;
-  WelcomeBackScreen: undefined;
+  GrantedScreen: undefined; // Add GrantedScreen to the navigation stack
 };
 
 type BasicDetailsNavigationProp = StackNavigationProp<RootStackParamList, 'BasicDetails'>;
@@ -77,8 +77,8 @@ const BasicDetailsForm = () => {
       const userAge = calculateAge(dateOfBirth);
       
       if (userAge >= 18) {
-        // User is 18 or older - go to WelcomeBackScreen
-        navigation.navigate('WelcomeBackScreen');
+        // User is 18 or older - go to GrantedScreen
+        navigation.navigate('GrantedScreen');
       } else {
         // User is under 18 - go to GuardianConsent page
         navigation.navigate('GuardianConsent');
@@ -167,20 +167,20 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     flex: 1,
-    paddingTop: 40,
+    paddingTop: 10,
   },
   title: {
     fontSize: 28,
-    fontWeight: '700',
+    fontWeight: '500',
     color: '#000',
-    marginBottom: 40,
+    marginBottom: 30,
     textAlign: 'left',
   },
   label: {
     fontSize: 16,
     color: '#000',
     marginBottom: 8,
-    marginTop: 24,
+    marginTop: 10,
     fontWeight: '400',
   },
   input: {
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#000',
     marginBottom: 8,
-    borderWidth: 1,
+    borderWidth: 3,
   },
   inputEmpty: {
     borderColor: '#D1D5DB', // Grey border when empty
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     paddingVertical: 16,
     alignItems: 'center',
-    marginTop: 60,
+    marginTop: 400,
     marginBottom: 40,
   },
   continueButtonInactive: {
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#A0A0A0',
   },
   continueButtonText: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
   },
   continueButtonTextInactive: {

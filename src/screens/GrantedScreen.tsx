@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, { useState } from 'react';
+import { Image, Platform, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import PrimaryButton from '../components/PrimaryButton';
 
 type RootStackParamList = {
   GrantedScreen: undefined;
@@ -20,11 +20,9 @@ const GrantedScreen: React.FC = () => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-  navigation.navigate('CreateAvatar1');
+      navigation.navigate('CreateAvatar1');
     }, 2000);
   };
-
-
 
   return (
     <SafeAreaView style={styles.container}>
@@ -41,18 +39,14 @@ const GrantedScreen: React.FC = () => {
         <Text style={styles.messageText}>
           Your account has been successfully verified. You're now ready to begin your journey with Uyir.
         </Text>
-        <TouchableOpacity style={styles.ctaButton} onPress={handleContinue} disabled={isLoading}>
-          {isLoading ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-              <View style={{ marginRight: 8 }}>
-                <Text style={{ color: '#fff', fontSize: 18 }}>Loading...</Text>
-              </View>
-            </View>
-          ) : (
-            <Text style={styles.ctaButtonText}>Continue</Text>
-          )}
-        </TouchableOpacity>
-        <View style={{ height: insets.bottom }} />
+        <PrimaryButton
+          title={isLoading ? 'Loading...' : 'Continue'}
+          onPress={handleContinue}
+          disabled={isLoading}
+          style={styles.continueButton}
+          textStyle={styles.continueButtonText}
+        />
+        <View style={[styles.bottomSpacer, { height: insets.bottom }]} />
       </View>
     </SafeAreaView>
   );
@@ -97,21 +91,19 @@ const styles = StyleSheet.create({
     marginTop: 0,
     width: '100%',
   },
-  ctaButton: {
+  continueButton: {
     width: '100%',
     maxWidth: 345,
-    height: 56,
-    backgroundColor: '#8170FF',
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
     alignSelf: 'center',
     marginBottom: 8,
+    height: 56,
   },
-  ctaButtonText: {
-    color: '#fff',
+  continueButtonText: {
     fontSize: 18,
     fontWeight: '500',
+  },
+  bottomSpacer: {
+    height: 0, // Will be set dynamically with insets.bottom
   },
 });
 

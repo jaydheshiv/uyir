@@ -1,6 +1,6 @@
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, ActivityIndicator, Platform } from 'react-native';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { ActivityIndicator, Image, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 // Define your stack param list with the correct route names
 type RootStackParamList = {
@@ -37,8 +37,8 @@ const GuardianGrantedScreen: React.FC = () => {
       </View>
       <TouchableOpacity style={styles.ctaButton} onPress={handleContinue} disabled={isLoading}>
         {isLoading ? (
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-            <ActivityIndicator color="#fff" style={{ marginRight: 8 }} />
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator color="#fff" style={styles.loadingIndicator} />
             <Text style={styles.ctaButtonText}>Loading...</Text>
           </View>
         ) : (
@@ -93,6 +93,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: '500',
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingIndicator: {
+    marginRight: 8,
   },
 });
 
