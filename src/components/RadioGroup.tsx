@@ -24,13 +24,13 @@ const RadioGroup: React.FC<RadioGroupProps> = ({ options, selected, onSelect }) 
 );
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', marginVertical: 6 },
+  row: { flexDirection: 'row', alignItems: 'center', marginVertical: 5.4 },
   circle: {
-    width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: '#8170FF',
-    marginRight: 10, alignItems: 'center', justifyContent: 'center',
+    width: 18, height: 18, borderRadius: 9, borderWidth: 2, borderColor: '#8170FF',
+    marginRight: 9, alignItems: 'center', justifyContent: 'center',
   },
   selected: { backgroundColor: '#8170FF' },
-  label: { fontSize: 16, color: '#000' },
+  label: { fontSize: 14.4, color: '#000' },
 });
 
 export default RadioGroup;

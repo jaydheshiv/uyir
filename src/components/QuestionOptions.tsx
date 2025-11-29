@@ -47,19 +47,19 @@ export default function QuestionOptions({
 
 const styles = StyleSheet.create({
   questionText: {
-    fontSize: 18,
+    fontSize: 16.2,
     color: '#111',
     fontWeight: '400',
     textAlign: 'center',
-    marginBottom: 50,
+    marginBottom: 45,
     fontFamily: 'System',
   },
   optionButton: {
     borderWidth: 1,
     borderColor: '#222',
-    borderRadius: 28,
-    paddingVertical: 14,
-    marginBottom: 14,
+    borderRadius: 25.2,
+    paddingVertical: 12.6,
+    marginBottom: 12.6,
     backgroundColor: '#ECECEC',
     alignItems: 'center',
     width: width - 100,
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     borderColor: '#A393FA',
   },
   optionText: {
-    fontSize: 15,
+    fontSize: 13.5,
     color: '#222',
     fontWeight: '400',
     fontFamily: 'System',

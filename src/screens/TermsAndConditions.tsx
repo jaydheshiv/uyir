@@ -4,11 +4,11 @@ import React, { useState } from 'react';
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { useProfileContext } from '../store/ProfileContext';
+import { useProfessional } from '../store/useAppStore'; // ✅ Use Zustand
 
 const TermsAndConditions: React.FC = () => {
 	const [agreed, setAgreed] = useState(false);
-	const { setAcceptedTerms } = useProfileContext();
+	const { markProTermsAccepted, markProfessionalCreated } = useProfessional();  // ✅ Use Zustand
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
 	return (
@@ -56,8 +56,17 @@ const TermsAndConditions: React.FC = () => {
 				disabled={!agreed}
 				activeOpacity={agreed ? 0.7 : 1}
 				onPress={() => {
-					setAcceptedTerms(true);
-					navigation.navigate('ProfileScreen');
+					// ✅ NOW mark as professional - ALL screens completed!
+					markProfessionalCreated();  // Mark professional profile as fully completed
+					markProTermsAccepted();  // Mark terms accepted in Zustand
+					console.log('✅ Pro terms accepted - User is now a professional');
+					console.log('✅ All professional onboarding screens completed!');
+					console.log('✅ Navigating to ProfileScreen with professional UI');
+					// ✅ Navigate to ProfileScreen - it will show microsite buttons based on hasAcceptedProTerms
+					navigation.reset({
+						index: 0,
+						routes: [{ name: 'ProfileScreen' as never }],
+					});
 				}}
 			>
 				<Text style={[styles.buttonText, agreed && styles.buttonTextActive]}>Agree & Continue</Text>
@@ -70,29 +79,29 @@ const styles = StyleSheet.create({
 	root: {
 		flex: 1,
 		backgroundColor: '#fff',
-		paddingHorizontal: 24,
-		paddingTop: Platform.OS === 'ios' ? 60 : 40,
+		paddingHorizontal: 18,
+		paddingTop: Platform.OS === 'ios' ? 50 : 32,
 	},
 	heading: {
-		fontSize: 20,
+		fontSize: 16.2,
 		fontWeight: '700',
-		marginBottom: 30,
-		marginTop: 30,
+		marginBottom: 18,
+		marginTop: 45,
 		color: '#222',
 		fontFamily: Platform.OS === 'ios' ? 'Outfit-Bold' : undefined,
 	},
 	section: {
-		marginBottom: 32,
+		marginBottom: 21.6,
 	},
 	sectionTitle: {
-		fontSize: 22,
+		fontSize: 17.1,
 		fontWeight: '800',
 		color: '#222',
-		marginBottom: 8,
+		marginBottom: 5.4,
 		fontFamily: Platform.OS === 'ios' ? 'Outfit-Bold' : undefined,
 	},
 	sectionText: {
-		fontSize: 16,
+		fontSize: 12.6,
 		fontWeight: '500',
 		color: '#222',
 		fontFamily: Platform.OS === 'ios' ? 'Outfit-Regular' : undefined,
@@ -100,16 +109,16 @@ const styles = StyleSheet.create({
 	checkboxRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginBottom: 32,
-		marginTop: 150,
+		marginBottom: 21.6,
+		marginTop: 90,
 	},
 	checkbox: {
-		width: 24,
-		height: 24,
+		width: 19.8,
+		height: 19.8,
 		borderWidth: 2,
 		borderColor: '#8170FF',
-		borderRadius: 6,
-		marginRight: 12,
+		borderRadius: 4.5,
+		marginRight: 9,
 		backgroundColor: '#fff',
 		justifyContent: 'center',
 		alignItems: 'center',
@@ -119,16 +128,17 @@ const styles = StyleSheet.create({
 		borderColor: '#8170FF',
 	},
 	checkboxLabel: {
-		fontSize: 16,
+		fontSize: 12.6,
 		color: '#BDBDBD',
 		fontFamily: Platform.OS === 'ios' ? 'Outfit-Regular' : undefined,
 	},
 	button: {
 		backgroundColor: '#D9D9D9',
-		borderRadius: 32,
-		paddingVertical: 18,
+		borderRadius: 23.4,
+		paddingVertical: 12.6,
 		alignItems: 'center',
-		marginBottom: 10,
+		marginBottom: 7.2,
+		bottom: 0,
 	},
 	buttonActive: {
 		backgroundColor: '#8170FF',
@@ -138,7 +148,7 @@ const styles = StyleSheet.create({
 	},
 	buttonText: {
 		color: '#222',
-		fontSize: 18,
+		fontSize: 14.4,
 		fontWeight: '700',
 		fontFamily: Platform.OS === 'ios' ? 'Outfit-Bold' : undefined,
 	},
@@ -148,3 +158,4 @@ const styles = StyleSheet.create({
 });
 
 export default TermsAndConditions;
+

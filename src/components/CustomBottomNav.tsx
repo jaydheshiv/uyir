@@ -1,10 +1,11 @@
+import { NavigationProp, useNavigation, useRoute } from "@react-navigation/native";
 import React from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { useTheme } from "../theme/ThemeContext";
 import ClockFolderIcon from "./ClockFolderIcon";
-import WindRoseIcon from "./WindRoseIcon";
 import UserProfileIcon from "./UserProfileIcon";
-import { useNavigation, NavigationProp, useRoute } from "@react-navigation/native";
+import WindRoseIcon from "./WindRoseIcon";
 
 type Props = {
   onClockPress?: () => void;
@@ -20,20 +21,21 @@ type RootStackParamList = {
   ProfileScreen: undefined;
 };
 
-const CustomBottomNav = ({}: Props) => {
+const CustomBottomNav = ({ }: Props) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute();
+  const { theme } = useTheme();
 
   // Determine which icon is active based on the current route name
   const getIconColor = (routeName: keyof RootStackParamList) =>
-    route.name === routeName ? "#9170FF" : "#222";
+    route.name === routeName ? theme.primary : theme.textSecondary;
 
   return (
-    <View style={styles.bottomNav}>
+    <View style={[styles.bottomNav, { backgroundColor: theme.bottomNavBackground }]}>
       <View style={styles.navButtons}>
         {/* Home Icon */}
         <TouchableOpacity onPress={() => navigation.navigate("Avatarhome1")}>
-          <Ionicons name="home-outline" size={32} color={getIconColor("Avatarhome1")} />
+          <Ionicons name="home-outline" size={28} color={getIconColor("Avatarhome1")} />
         </TouchableOpacity>
         {/* Clock Icon */}
         <TouchableOpacity onPress={() => navigation.navigate("Visualizations")}>
@@ -41,7 +43,7 @@ const CustomBottomNav = ({}: Props) => {
         </TouchableOpacity>
         {/* Wind Rose Icon */}
         <TouchableOpacity onPress={() => navigation.navigate("Discoverprotier")}>
-          <WindRoseIcon width={32} height={32} color={getIconColor("Discoverprotier")} />
+          <WindRoseIcon width={28} height={28} color={getIconColor("Discoverprotier")} />
         </TouchableOpacity>
         {/* User Profile Icon */}
         <TouchableOpacity onPress={() => navigation.navigate("ProfileScreen")}>
@@ -55,16 +57,16 @@ const CustomBottomNav = ({}: Props) => {
 const styles = StyleSheet.create({
   bottomNav: {
     backgroundColor: "#F6F6F6",
-    paddingVertical: 35,
-    paddingHorizontal: 1,
+    paddingVertical: 31.5,
+    paddingHorizontal: 0.9,
     shadowColor: "#000",
     shadowOffset: { width: -4, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 35,
     elevation: 5,
     marginBottom: -30,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 21.6,
+    borderTopRightRadius: 21.6,
   },
   navButtons: {
     flexDirection: "row",

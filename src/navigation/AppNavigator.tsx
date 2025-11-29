@@ -18,6 +18,8 @@ import KnowledgeBaseFolder from '../screens/KnowledgeBaseFolder'; // Add Knowled
 import NotGuardianGrantedScreen from '../screens/NotGuardianGrantedScreen';
 import PublicMicrositePTView from '../screens/PublicMicrositePTView';
 import SessionSettings from '../screens/SessionSettings'; // Add SessionSettings import
+import SubscribedProfessionals from '../screens/SubscribedProfessionals'; // Add SubscribedProfessionals import
+import { ThemeProvider } from '../theme/ThemeContext';
 
 // Import screens
 import OnboardingScreen1 from '../screens/OnboardingScreen1';
@@ -31,6 +33,7 @@ import About from '../screens/About';
 import Avatar from '../screens/Avatar';
 import Avatarhome1 from '../screens/Avatarhome1';
 import BasicDetails from '../screens/BasicDetails';
+import BookedSession from '../screens/BookedSession';
 import ChoosePaymentMethod from '../screens/ChoosePaymentMethod'; // Add this import
 import Connections from '../screens/Connections'; // Add this import
 import Connections1 from '../screens/Connections1'; // Add this import at the top
@@ -51,6 +54,7 @@ import OTPVerificationScreenlogin from '../screens/OTPVerificationScreenlogin';
 import PasswordChange from '../screens/PasswordChange';
 import PaymentSuccessful from '../screens/PaymentSuccessful'; // Add this import
 import PrivacyPolicy from '../screens/PrivacyPolicy';
+import ProfessionalPhotoGuidelines from '../screens/ProfessionalPhotoGuidelines';
 import ProfileScreen from '../screens/ProfileScreen'; // Add this import
 import ProfileSettings from '../screens/ProfileSettings'; // Add ProfileSettings import
 import ProfileStatusScreen from '../screens/ProfileStatus'; // Add this import
@@ -64,6 +68,7 @@ import SupportPage2 from '../screens/SupportPage2';
 import TotalDonations from '../screens/TotalDonations';
 import TotalSubscribers from '../screens/TotalSubscribers';
 import UpComingSessions from '../screens/UpComingSessions';
+import UpComingUserSessions from '../screens/UpComingUserSessions';
 import Upload from '../screens/Upload';
 import Visualizations from '../screens/Visualizations';
 
@@ -76,6 +81,15 @@ export type RootStackParamList = {
 	LoginFlow: undefined;
 	Home: undefined;
 	BasicDetails: undefined;
+	BookedSession: {
+		sessionId: string;
+		callUrl: string;
+		accessToken: string;
+		roomName: string;
+		participantIdentity: string;
+		participantRole: string;
+		livekitUrl: string;
+	};
 	GuardianConsent: undefined;
 	OTPVerificationScreen: { code: string; email?: string; mobile?: string };
 	OTPVerificationScreenlogin: { code?: string; email?: string; mobile?: string };
@@ -86,7 +100,7 @@ export type RootStackParamList = {
 	NotGuardianGrantedScreen: undefined;
 	ApprovalStatusChecker: { guardianEmail: string };
 	CreateAvatar1: undefined;
-	CreateAccount: undefined;
+	CreateAccount: { avatarId?: string | null } | undefined;
 	AddYourVoice: undefined;
 	AccountGranted: undefined;
 	DefaultAvatar: undefined;
@@ -105,6 +119,7 @@ export type RootStackParamList = {
 	DebitCreditCard: undefined; // Add this line
 	PaymentSuccessful: undefined; // Add this line
 	CreateAvatar3: undefined; // Add this line
+	ProfessionalPhotoGuidelines: undefined;
 	LetUsKnowYou: undefined; // Add this line
 	UploadContent: undefined; // Added UploadContent screen
 	LetUsKnowYou2: undefined; // Added LetUsKnowYou2 screen
@@ -113,6 +128,7 @@ export type RootStackParamList = {
 	TotalSubscribers: undefined;
 	TotalDonations: undefined;
 	UpComingSessions: undefined;
+	UpComingUserSessions: undefined;
 	Upload: undefined;
 	Invite: undefined; // Added Invite screen
 	EditProfile: undefined; // Add this line
@@ -126,7 +142,7 @@ export type RootStackParamList = {
 	SupportPage1: undefined;
 	SupportPage2: undefined;
 	PasswordChange: undefined;
-	PublicMicrositePTView: undefined;
+	PublicMicrositePTView: { professional_id?: string } | undefined;
 	ProfileSettings: undefined; // Add ProfileSettings to stack param list
 	SubscriptionSettings: undefined; // Add SubscriptionSettings to stack param list
 	SessionSettings: undefined; // Add SessionSettings to stack param list
@@ -136,6 +152,7 @@ export type RootStackParamList = {
 	CvGeneral: undefined; // Add CvGeneral to stack param list
 	CvKnowledgeBase1: undefined; // Add CvKnowledgeBase1 to stack param list
 	KnowledgeBaseFolder: undefined; // Add KnowledgeBaseFolder to stack param list
+	SubscribedProfessionals: undefined; // Add SubscribedProfessionals to stack param list
 
 };
 
@@ -160,85 +177,91 @@ import TermsAndConditions from '../screens/TermsAndConditions';
 
 const AppNavigator: React.FC = () => {
 	return (
-		<NavigationContainer>
-			<Stack.Navigator
-				initialRouteName="Splash"
-				screenOptions={{
-					headerShown: false,
-					gestureEnabled: true,
-				}}
-			>
-				<Stack.Screen name="Splash" component={SplashScreen} />
-				<Stack.Screen name="Walkthrough1" component={Walkthrough1} options={fadeTransition} />
-				<Stack.Screen name="Walkthrough2" component={Walkthrough2} options={fadeTransition} />
-				<Stack.Screen name="Walkthrough3" component={Walkthrough3} options={fadeTransition} />
-				<Stack.Screen name="OnboardingScreen1" component={OnboardingScreen1} />
-				<Stack.Screen name="LoginFlow" component={LoginFlow} />
-				{/* <Stack.Screen name="Login" component={LoginScreen} /> */}
-				{/* <Stack.Screen name="SignUp" component={SignUpScreen} /> */}
-				<Stack.Screen name="Home" component={Avatarhome1} />
-				<Stack.Screen name="BasicDetails" component={BasicDetails} />
-				<Stack.Screen name="GuardianConsent" component={GuardianConsent} />
-				<Stack.Screen name="SignupFlow" component={SignupFlow} />
-				<Stack.Screen name="OTPVerificationScreen" component={OTPVerificationScreen} />
-				<Stack.Screen name="OTPVerificationPhoneScreen" component={OTPVerificationPhoneScreen} />
-				<Stack.Screen name="OTPVerificationScreenlogin" component={OTPVerificationScreenlogin} />
-				<Stack.Screen name="GrantedScreen" component={GrantedScreen} />
-				<Stack.Screen name="CreateAvatar1" component={CreateAvatar1} />
-				<Stack.Screen name="CreateAccount" component={CreateAccount} />
-				<Stack.Screen name="GuardianGrantedScreen" component={GuardianGrantedScreen} />
-				<Stack.Screen name="NotGuardianGrantedScreen" component={NotGuardianGrantedScreen} />
-				<Stack.Screen name="ApprovalStatusChecker" component={ApprovalStatusChecker} />
-				<Stack.Screen name="AccountGranted" component={AccountGranted} />
-				<Stack.Screen name="DefaultAvatar" component={DefaultAvatar} />
-				<Stack.Screen name="Learnmore" component={require('../screens/Learnmore').default} />
-				<Stack.Screen name="Avatarhome1" component={Avatarhome1} />
-				<Stack.Screen name="Visualizations" component={Visualizations} />
-				<Stack.Screen name="Connections" component={Connections} options={{ presentation: 'modal' }} />
-				<Stack.Screen name="Connections1" component={Connections1} options={{ presentation: 'modal' }} />
-				<Stack.Screen name="ProfileScreen" component={ProfileScreen} />
-				<Stack.Screen name="ProfileStatus" component={ProfileStatusScreen} />
-				<Stack.Screen name="Discoverprotier" component={require('../screens/Discoverprotier').default} />
-				<Stack.Screen name="SeePlans" component={SeePlans} />
-				<Stack.Screen name="Editing" component={Editing} />
-				<Stack.Screen name="ProLite" component={ProLite} />
-				<Stack.Screen name="ChoosePaymentMethod" component={ChoosePaymentMethod} />
-				<Stack.Screen name="DebitCreditCard" component={DebitCreditCard} />
-				<Stack.Screen name="PaymentSuccessful" component={PaymentSuccessful} />
-				<Stack.Screen name="CreateAvatar3" component={CreateAvatar3} />
-				<Stack.Screen name="LetUsKnowYou" component={require('../screens/LetUsKnowYou').default} />
-				<Stack.Screen name="UploadContent" component={UploadContent} />
-				<Stack.Screen name="LetUsKnowYou2" component={LetUsKnowYou2} />
-				<Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
-				<Stack.Screen name="MicrositePTView" component={MicrositePTView} />
-				<Stack.Screen name="TotalSubscribers" component={TotalSubscribers} />
-				<Stack.Screen name="TotalDonations" component={TotalDonations} />
-				<Stack.Screen name="UpComingSessions" component={UpComingSessions} />
-				<Stack.Screen name="Upload" component={Upload} />
-				<Stack.Screen name="Invite" component={Invite} />
-				<Stack.Screen name="EditProfile" component={EditProfile} />
-				<Stack.Screen name="Avatar" component={Avatar} />
-				<Stack.Screen name="DeleteAccount" component={DeleteAccount} />
-				<Stack.Screen name="SupportPage" component={SupportPage} />
-				<Stack.Screen name="SupportPage1" component={SupportPage1} />
-				<Stack.Screen name="SupportPage2" component={SupportPage2} />
-				<Stack.Screen name="PasswordChange" component={PasswordChange} />
-				<Stack.Screen name="Language" component={Language} />
-				<Stack.Screen name="FeedbackPage" component={FeedbackPage} />
-				<Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
-				<Stack.Screen name="About" component={About} />
-				<Stack.Screen name="PublicMicrositePTView" component={PublicMicrositePTView} />
-				<Stack.Screen name="ProfileSettings" component={ProfileSettings} />
-				<Stack.Screen name="SubscriptionSettings" component={SubscriptionSettings} />
-				<Stack.Screen name="SessionSettings" component={SessionSettings} />
-				<Stack.Screen name="KnowledgeBase" component={KnowledgeBase} />
-				<Stack.Screen name="ContentVisibility" component={ContentVisibility} />
-				<Stack.Screen name="CvKnowledgeBase" component={CvKnowledgeBase} />
-				<Stack.Screen name="CvKnowledgeBase1" component={CvKnowledgeBase1} />
-				<Stack.Screen name="KnowledgeBaseFolder" component={KnowledgeBaseFolder} />
-				<Stack.Screen name="CvGeneral" component={CvGeneral} />
-			</Stack.Navigator>
-		</NavigationContainer>
+		<ThemeProvider>
+			<NavigationContainer>
+				<Stack.Navigator
+					initialRouteName="Splash"
+					screenOptions={{
+						headerShown: false,
+						gestureEnabled: true,
+					}}
+				>
+					<Stack.Screen name="Splash" component={SplashScreen} />
+					<Stack.Screen name="Walkthrough1" component={Walkthrough1} options={fadeTransition} />
+					<Stack.Screen name="Walkthrough2" component={Walkthrough2} options={fadeTransition} />
+					<Stack.Screen name="Walkthrough3" component={Walkthrough3} options={fadeTransition} />
+					<Stack.Screen name="OnboardingScreen1" component={OnboardingScreen1} />
+					<Stack.Screen name="LoginFlow" component={LoginFlow} />
+					{/* <Stack.Screen name="Login" component={LoginScreen} /> */}
+					{/* <Stack.Screen name="SignUp" component={SignUpScreen} /> */}
+					<Stack.Screen name="Home" component={Avatarhome1} />
+					<Stack.Screen name="BasicDetails" component={BasicDetails} />
+					<Stack.Screen name="BookedSession" component={BookedSession} />
+					<Stack.Screen name="GuardianConsent" component={GuardianConsent} />
+					<Stack.Screen name="SignupFlow" component={SignupFlow} />
+					<Stack.Screen name="OTPVerificationScreen" component={OTPVerificationScreen} />
+					<Stack.Screen name="OTPVerificationPhoneScreen" component={OTPVerificationPhoneScreen} />
+					<Stack.Screen name="OTPVerificationScreenlogin" component={OTPVerificationScreenlogin} />
+					<Stack.Screen name="GrantedScreen" component={GrantedScreen} />
+					<Stack.Screen name="CreateAvatar1" component={CreateAvatar1} />
+					<Stack.Screen name="CreateAccount" component={CreateAccount} />
+					<Stack.Screen name="GuardianGrantedScreen" component={GuardianGrantedScreen} />
+					<Stack.Screen name="NotGuardianGrantedScreen" component={NotGuardianGrantedScreen} />
+					<Stack.Screen name="ApprovalStatusChecker" component={ApprovalStatusChecker} />
+					<Stack.Screen name="AccountGranted" component={AccountGranted} />
+					<Stack.Screen name="DefaultAvatar" component={DefaultAvatar} />
+					<Stack.Screen name="Learnmore" component={require('../screens/Learnmore').default} />
+					<Stack.Screen name="Avatarhome1" component={Avatarhome1} />
+					<Stack.Screen name="Visualizations" component={Visualizations} />
+					<Stack.Screen name="Connections" component={Connections} options={{ presentation: 'modal' }} />
+					<Stack.Screen name="Connections1" component={Connections1} options={{ presentation: 'modal' }} />
+					<Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+					<Stack.Screen name="ProfileStatus" component={ProfileStatusScreen} />
+					<Stack.Screen name="Discoverprotier" component={require('../screens/Discoverprotier').default} />
+					<Stack.Screen name="SeePlans" component={SeePlans} />
+					<Stack.Screen name="Editing" component={Editing} />
+					<Stack.Screen name="ProLite" component={ProLite} />
+					<Stack.Screen name="ChoosePaymentMethod" component={ChoosePaymentMethod} />
+					<Stack.Screen name="DebitCreditCard" component={DebitCreditCard} />
+					<Stack.Screen name="PaymentSuccessful" component={PaymentSuccessful} />
+					<Stack.Screen name="CreateAvatar3" component={CreateAvatar3} />
+					<Stack.Screen name="ProfessionalPhotoGuidelines" component={ProfessionalPhotoGuidelines} />
+					<Stack.Screen name="LetUsKnowYou" component={require('../screens/LetUsKnowYou').default} />
+					<Stack.Screen name="UploadContent" component={UploadContent} />
+					<Stack.Screen name="LetUsKnowYou2" component={LetUsKnowYou2} />
+					<Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
+					<Stack.Screen name="MicrositePTView" component={MicrositePTView} />
+					<Stack.Screen name="TotalSubscribers" component={TotalSubscribers} />
+					<Stack.Screen name="TotalDonations" component={TotalDonations} />
+					<Stack.Screen name="UpComingSessions" component={UpComingSessions} />
+					<Stack.Screen name="UpComingUserSessions" component={UpComingUserSessions} />
+					<Stack.Screen name="Upload" component={Upload} />
+					<Stack.Screen name="Invite" component={Invite} />
+					<Stack.Screen name="EditProfile" component={EditProfile} />
+					<Stack.Screen name="Avatar" component={Avatar} />
+					<Stack.Screen name="DeleteAccount" component={DeleteAccount} />
+					<Stack.Screen name="SupportPage" component={SupportPage} />
+					<Stack.Screen name="SupportPage1" component={SupportPage1} />
+					<Stack.Screen name="SupportPage2" component={SupportPage2} />
+					<Stack.Screen name="PasswordChange" component={PasswordChange} />
+					<Stack.Screen name="Language" component={Language} />
+					<Stack.Screen name="FeedbackPage" component={FeedbackPage} />
+					<Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+					<Stack.Screen name="About" component={About} />
+					<Stack.Screen name="PublicMicrositePTView" component={PublicMicrositePTView} />
+					<Stack.Screen name="ProfileSettings" component={ProfileSettings} />
+					<Stack.Screen name="SubscribedProfessionals" component={SubscribedProfessionals} />
+					<Stack.Screen name="SubscriptionSettings" component={SubscriptionSettings} />
+					<Stack.Screen name="SessionSettings" component={SessionSettings} />
+					<Stack.Screen name="KnowledgeBase" component={KnowledgeBase} />
+					<Stack.Screen name="ContentVisibility" component={ContentVisibility} />
+					<Stack.Screen name="CvKnowledgeBase" component={CvKnowledgeBase} />
+					<Stack.Screen name="CvKnowledgeBase1" component={CvKnowledgeBase1} />
+					<Stack.Screen name="KnowledgeBaseFolder" component={KnowledgeBaseFolder} />
+					<Stack.Screen name="CvGeneral" component={CvGeneral} />
+				</Stack.Navigator>
+			</NavigationContainer>
+		</ThemeProvider>
 	);
 };
 

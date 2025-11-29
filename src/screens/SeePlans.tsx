@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform, StatusBar } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import React from 'react';
+import { Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 type RootStackParamList = {
   SeePlans: undefined;
@@ -45,44 +45,44 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
-    paddingHorizontal: 24,
+    paddingTop: Platform.OS === 'ios' ? 50 : 32,
+    paddingHorizontal: 18,
   },
   backButton: {
-    marginBottom: 34,
-    marginTop: 30,
+    marginBottom: 21.6,
+    marginTop: 27,
     alignSelf: 'flex-start',
   },
   title: {
-    fontSize: 32,
+    fontSize: 23.4,
     fontWeight: 'bold',
     color: '#111',
-    marginBottom: 16,
+    marginBottom: 10.8,
     fontFamily: Platform.OS === 'ios' ? 'Outfit-Bold' : undefined,
   },
   description: {
-    fontSize: 18,
+    fontSize: 14.4,
     color: '#222',
     marginBottom: 0,
     fontFamily: Platform.OS === 'ios' ? 'Outfit-Regular' : undefined,
-    lineHeight: 26,
-    maxWidth: 340,
+    lineHeight: 19.8,
+    maxWidth: 270,
   },
   ctaButton: {
     position: 'absolute',
-    left: 24,
-    right: 24,
-    bottom: 32,
+    left: 18,
+    right: 18,
+    bottom: 49.5,
     backgroundColor: '#7C6BFF',
-    height: 64,
-    borderRadius: 32,
+    height: 46.8,
+    borderRadius: 23.4,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 2,
   },
   ctaButtonText: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 16.2,
     fontWeight: '600',
     fontFamily: Platform.OS === 'ios' ? 'Outfit-Medium' : undefined,
   },

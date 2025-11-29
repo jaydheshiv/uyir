@@ -5,9 +5,11 @@ import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CustomBottomNav from '../components/CustomBottomNav';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { useTheme } from '../theme/ThemeContext';
 
 const EditProfile: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const { theme } = useTheme();
   const [fullName, setFullName] = useState('Arya');
   const [dob, setDob] = useState('20-07-2004');
   const [email, setEmail] = useState('arya0077@gmail.com');
@@ -15,40 +17,40 @@ const EditProfile: React.FC = () => {
   const [city, setCity] = useState('Bangalore');
 
   return (
-    <SafeAreaView style={styles.safeAreaContainer}>
-      <ScrollView contentContainerStyle={styles.container}>
+    <SafeAreaView style={[styles.safeAreaContainer, { backgroundColor: theme.background }]}>
+      <ScrollView contentContainerStyle={[styles.container, { backgroundColor: theme.background }]}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={28} color="#222" />
+          <Ionicons name="arrow-back" size={28} color={theme.text} />
         </TouchableOpacity>
-        <Text style={styles.title}>Update profile</Text>
+        <Text style={[styles.title, { color: theme.text }]}>Update profile</Text>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Full name</Text>
-          <TextInput style={styles.input} value={fullName} onChangeText={setFullName} placeholder="Full name" placeholderTextColor="#aaa" />
+          <Text style={[styles.label, { color: theme.text }]}>Full name</Text>
+          <TextInput style={[styles.input, { backgroundColor: theme.cardBackground, color: theme.text, borderColor: theme.border }]} value={fullName} onChangeText={setFullName} placeholder="Full name" placeholderTextColor={theme.inputPlaceholder} />
         </View>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Date of Birth</Text>
-          <TextInput style={styles.input} value={dob} onChangeText={setDob} placeholder="DD-MM-YYYY" placeholderTextColor="#aaa" />
+          <Text style={[styles.label, { color: theme.text }]}>Date of Birth</Text>
+          <TextInput style={[styles.input, { backgroundColor: theme.cardBackground, color: theme.text, borderColor: theme.border }]} value={dob} onChangeText={setDob} placeholder="DD-MM-YYYY" placeholderTextColor={theme.inputPlaceholder} />
         </View>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="Email" placeholderTextColor="#aaa" keyboardType="email-address" />
+          <Text style={[styles.label, { color: theme.text }]}>Email</Text>
+          <TextInput style={[styles.input, { backgroundColor: theme.cardBackground, color: theme.text, borderColor: theme.border }]} value={email} onChangeText={setEmail} placeholder="Email" placeholderTextColor={theme.inputPlaceholder} keyboardType="email-address" />
         </View>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Phone Number</Text>
+          <Text style={[styles.label, { color: theme.text }]}>Phone Number</Text>
           <View style={styles.phoneRow}>
-            <View style={styles.flagBox}>
+            <View style={[styles.flagBox, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
               <Text style={styles.flagText}>🇮🇳</Text>
             </View>
-            <View style={styles.codeBox}>
-              <Text style={styles.codeText}>+91</Text>
-              <Ionicons name="chevron-down" size={18} color="#888" style={styles.chevronIcon} />
+            <View style={[styles.codeBox, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
+              <Text style={[styles.codeText, { color: theme.text }]}>+91</Text>
+              <Ionicons name="chevron-down" size={18} color={theme.textSecondary} style={styles.chevronIcon} />
             </View>
-            <TextInput style={[styles.input, styles.phoneTextInput]} value={phone} onChangeText={setPhone} placeholder="Phone number" placeholderTextColor="#aaa" keyboardType="phone-pad" />
+            <TextInput style={[styles.input, styles.phoneTextInput, { backgroundColor: theme.cardBackground, color: theme.text, borderColor: theme.border }]} value={phone} onChangeText={setPhone} placeholder="Phone number" placeholderTextColor={theme.inputPlaceholder} keyboardType="phone-pad" />
           </View>
         </View>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>City</Text>
-          <TextInput style={styles.input} value={city} onChangeText={setCity} placeholder="City" placeholderTextColor="#aaa" />
+          <Text style={[styles.label, { color: theme.text }]}>City</Text>
+          <TextInput style={[styles.input, { backgroundColor: theme.cardBackground, color: theme.text, borderColor: theme.border }]} value={city} onChangeText={setCity} placeholder="City" placeholderTextColor={theme.inputPlaceholder} />
         </View>
         <TouchableOpacity style={styles.saveBtn}>
           <Text style={styles.saveText}>Save</Text>
@@ -63,37 +65,37 @@ const EditProfile: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 24,
+    padding: 21.6,
     paddingBottom: 0,
     backgroundColor: '#fff',
   },
   backBtn: {
-    marginBottom: 20,
-    marginTop: 40,
+    marginBottom: 18,
+    marginTop: 36,
     alignSelf: 'flex-start',
   },
   title: {
-    fontSize: 28,
+    fontSize: 25.2,
     fontWeight: 'bold',
     color: '#222',
-    marginBottom: 18,
+    marginBottom: 16.2,
     fontFamily: 'Outfit-Bold',
   },
   inputGroup: {
-    marginBottom: 18,
+    marginBottom: 16.2,
   },
   label: {
-    fontSize: 16,
+    fontSize: 14.4,
     color: '#222',
-    marginBottom: 6,
+    marginBottom: 5.4,
     fontFamily: 'Outfit-Bold',
   },
   input: {
     borderWidth: 1.5,
     borderColor: '#222',
-    borderRadius: 12,
-    padding: 14,
-    fontSize: 16,
+    borderRadius: 10.8,
+    padding: 12.6,
+    fontSize: 14.4,
     color: '#222',
     backgroundColor: '#fff',
     fontFamily: 'Outfit-Regular',
@@ -103,36 +105,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   flagBox: {
-    width: 38,
-    height: 38,
-    borderRadius: 8,
+    width: 34.2,
+    height: 34.2,
+    borderRadius: 7.2,
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1.5,
     borderColor: '#222',
-    marginRight: 8,
+    marginRight: 7.2,
   },
   codeBox: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#eee',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    marginRight: 8,
+    borderRadius: 7.2,
+    paddingHorizontal: 7.2,
+    paddingVertical: 5.4,
+    marginRight: 7.2,
   },
   saveBtn: {
     backgroundColor: '#8170FF',
-    borderRadius: 24,
-    paddingVertical: 16,
+    borderRadius: 21.6,
+    paddingVertical: 14.4,
     alignItems: 'center',
-    marginTop: 18,
-    marginBottom: 32,
+    marginTop: 16.2,
+    marginBottom: 28.8,
   },
   saveText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16.2,
     fontWeight: 'bold',
     fontFamily: 'Outfit-Bold',
   },
@@ -141,9 +143,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     backgroundColor: '#fff',
-    paddingVertical: 18,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    paddingVertical: 16.2,
+    borderTopLeftRadius: 21.6,
+    borderTopRightRadius: 21.6,
     elevation: 10,
     shadowColor: '#000',
     shadowOpacity: 0.08,
@@ -154,22 +156,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   flagText: {
-    fontSize: 22,
+    fontSize: 19.8,
   },
   codeText: {
-    fontSize: 16,
+    fontSize: 14.4,
     color: '#222',
   },
   chevronIcon: {
-    marginLeft: 4,
+    marginLeft: 3.6,
   },
   phoneTextInput: {
     flex: 1,
-    marginLeft: 8,
+    marginLeft: 7.2,
   },
   bottomNavContainer: {
-    marginBottom: 25,
+    marginBottom: 31.5,
   },
 });
 
 export default EditProfile;
+

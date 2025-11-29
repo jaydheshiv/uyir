@@ -1,19 +1,5 @@
 // ProfileScreen.js
-import React from 'react';
-import {
-  Dimensions,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { useProfileContext } from '../store/ProfileContext';
-import { useTheme } from '../store/ThemeContext';
-// Import this hook for perfect bottom spacing
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import {
   Bell,
   ChevronRight,
@@ -25,9 +11,25 @@ import {
   Projector,
   User,
 } from 'lucide-react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  Alert,
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import CustomBottomNav from '../components/CustomBottomNav'; // Add this import at the top
+import { applyPreset } from '../lib/imagekit'; // ✅ ImageKit transformations
+import { useAppStore, useAuth, useAvatar, useProfessional } from '../store/useAppStore'; // ✅ Use Zustand instead
+import { useTheme } from '../theme/ThemeContext';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -43,66 +45,221 @@ const CurvedHeaderBackground = () => (
 );
 
 export default function ProfileScreen() {
-  const { theme, setTheme } = useTheme();
-  const isDarkTheme = theme === 'dark';
+  const { theme } = useTheme();
+  const { isDarkMode, toggleDarkMode } = useAppStore();
+  const { user, token, logout } = useAuth();
+  const { hasAcceptedProTerms, professionalData } = useProfessional();
+  const { avatar, syncAvatarFromUser, setAvatarUrl } = useAvatar();
+  const [avatarImageUrl, setAvatarImageUrl] = useState<string | null>(null);
+  const [professionalImageUrl, setProfessionalImageUrl] = useState<string | null>(null);
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
+  const [loadingImage, setLoadingImage] = useState(false);
 
-  // Dynamic styles for dark mode
+  // ✅ Force re-render when user data changes
+  const [displayName, setDisplayName] = useState(user?.avatar_name || user?.email?.split('@')[0] || 'User');
+
+  // ✅ Update display name whenever user changes
+  useEffect(() => {
+    const newName = user?.avatar_name || user?.email?.split('@')[0] || 'User';
+    setDisplayName(newName);
+    console.log('👤 ProfileScreen: Updated display name to:', newName);
+  }, [user?.avatar_name, user?.email]);
+
+  // ✅ Fetch user avatar image (from CreateAvatar1)
+  const fetchUserAvatarImage = useCallback(async () => {
+    if (!user?.avatar_id || !token) {
+      console.log('👤 No avatar_id or token, skipping avatar image fetch');
+      return;
+    }
+
+    try {
+      setLoadingImage(true);
+      const backendUrl = `http://dev.api.uyir.ai:8081/api/avatar/${user.avatar_id}`;
+      console.log('👤 Fetching user avatar image from:', backendUrl);
+
+      const response = await fetch(backendUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('👤 Avatar image response:', data);
+        console.log('👤 Avatar image response keys:', Object.keys(data));
+
+        // Extract image URL from photo_path field
+        const imageUrl = data.photo_path || data.avatar_url || data.image_url || data.url;
+        console.log('👤 Extracted image URL:', imageUrl);
+
+        if (imageUrl) {
+          setAvatarImageUrl(imageUrl);
+          setAvatarUrl(imageUrl); // ✅ Save to Zustand for persistence
+          console.log('✅ Set avatar image URL:', imageUrl);
+        } else {
+          console.log('⚠️ No image URL found in response. Available fields:', Object.keys(data));
+        }
+      } else {
+        console.log('⚠️ Failed to fetch avatar image:', response.status);
+        const errorText = await response.text();
+        console.log('⚠️ Error response:', errorText);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching avatar image:', error);
+    } finally {
+      setLoadingImage(false);
+    }
+  }, [setAvatarUrl, token, user?.avatar_id]);
+
+  // ✅ Fetch professional profile image (from CreateAvatar3)
+  const fetchProfessionalImage = useCallback(async () => {
+    if (!hasAcceptedProTerms || !token) {
+      console.log('👤 Not a professional or no token, skipping professional image fetch');
+      return;
+    }
+
+    try {
+      setLoadingImage(true);
+      const backendUrl = 'http://dev.api.uyir.ai:8081/professional/';
+      console.log('👤 Fetching professional profile from:', backendUrl);
+
+      const response = await fetch(backendUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('👤 Professional profile response:', data);
+
+        // ✅ Extract data from nested professional object
+        const prof = data.professional || data;
+
+        // Extract image URLs from response
+        const profileImageUrl = prof.profile_image_url || prof.image_url || prof.avatar_url;
+        const coverImg = prof.cover_image_url;
+
+        if (profileImageUrl) {
+          setProfessionalImageUrl(profileImageUrl);
+          console.log('✅ Set professional profile image URL:', profileImageUrl);
+        }
+
+        if (coverImg) {
+          setCoverImageUrl(coverImg);
+          console.log('✅ Set professional cover image URL:', coverImg);
+        }
+      } else {
+        console.log('⚠️ Failed to fetch professional profile:', response.status);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching professional profile:', error);
+    } finally {
+      setLoadingImage(false);
+    }
+  }, [hasAcceptedProTerms, token]);
+
+  // ✅ Fetch images on mount
+  useEffect(() => {
+    if (hasAcceptedProTerms) {
+      fetchProfessionalImage();
+    } else {
+      fetchUserAvatarImage();
+    }
+  }, [hasAcceptedProTerms, fetchProfessionalImage, fetchUserAvatarImage]);
+
+  useEffect(() => {
+    if (avatar?.avatarUrl && avatarImageUrl !== avatar.avatarUrl) {
+      setAvatarImageUrl(avatar.avatarUrl);
+      return;
+    }
+
+    if (hasAcceptedProTerms && !avatarImageUrl && user?.avatar_id && token) {
+      fetchUserAvatarImage();
+    }
+  }, [avatar?.avatarUrl, avatarImageUrl, fetchUserAvatarImage, hasAcceptedProTerms, token, user?.avatar_id]);
+
+  // ✅ Sync avatar data when screen loads
+  useEffect(() => {
+    syncAvatarFromUser();
+    console.log('👤 ProfileScreen: Synced avatar from user');
+  }, []);
+
+  // ✅ Refresh data when screen comes into focus (after returning from Avatar screen)
+  useFocusEffect(
+    React.useCallback(() => {
+      syncAvatarFromUser();
+      const newName = user?.avatar_name || user?.email?.split('@')[0] || 'User';
+      setDisplayName(newName);
+
+      // Refresh images
+      if (hasAcceptedProTerms) {
+        fetchProfessionalImage();
+      } else {
+        fetchUserAvatarImage();
+      }
+
+      console.log('👤 ProfileScreen: Refreshed avatar data on focus');
+      console.log('👤 Current user data:', JSON.stringify(user, null, 2));
+    }, [fetchProfessionalImage, fetchUserAvatarImage, hasAcceptedProTerms, syncAvatarFromUser, user])
+  );
+
   const dynamicStyles = StyleSheet.create({
     screen: {
       flex: 1,
-      backgroundColor: isDarkTheme ? '#232336' : 'white', // slightly darker dark bg
+      backgroundColor: theme.background,
     },
     menuSection: {
-      backgroundColor: isDarkTheme ? '#2D2D44' : '#F2F2F2', // slightly darker card bg
+      backgroundColor: theme.cardBackground,
       elevation: 2,
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
+      shadowOffset: { width: 0, height: 0.9 },
       shadowOpacity: 0.1,
       shadowRadius: 1,
     },
     menuItemLabel: {
-      fontSize: 14,
-      color: isDarkTheme ? '#F2F2F2' : 'black', // lighter text for contrast
+      fontSize: 12.6,
+      color: theme.text,
     },
     userName: {
-      color: isDarkTheme ? 'white' : '#222',
+      color: theme.text,
     },
     userInfo: {
-      color: isDarkTheme ? 'white' : 'black',
+      color: theme.text,
     },
     subscriberCount: {
-      color: isDarkTheme ? 'white' : '#222',
+      color: theme.text,
     },
     subscriberLabel: {
-      color: isDarkTheme ? '#B8B8B8' : '#868686',
+      color: theme.textSecondary,
     },
     analyticsFooter: {
-      color: isDarkTheme ? 'white' : '#222',
+      color: theme.text,
     },
     analyticsFooterRight: {
-      color: isDarkTheme ? '#B8B8B8' : '#868686',
+      color: theme.textSecondary,
     },
     analyticsCard: {
-      backgroundColor: isDarkTheme ? '#3A3A52' : '#fff',
-      borderColor: isDarkTheme ? '#4A4A62' : '#EDEDED',
+      backgroundColor: theme.cardBackground,
+      borderColor: theme.border,
     },
     analyticsLabel: {
-      color: isDarkTheme ? '#B8B8B8' : '#868686',
+      color: theme.textSecondary,
     },
     analyticsValue: {
-      color: isDarkTheme ? 'white' : '#222',
+      color: theme.text,
     },
     destructiveText: {
-      color: isDarkTheme ? '#FF6B6B' : '#C53F3F',
+      color: theme.error,
     },
   });
 
   // Dynamic colors for icons and elements
-  const chevronColor = isDarkTheme ? '#F2F2F2' : '#1D1B20';
-  const iconColor = isDarkTheme ? '#F2F2F2' : 'black';
+  const chevronColor = theme.text;
+  const iconColor = theme.text;
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
-  const { acceptedTerms } = useProfileContext();
+  const hasAvatar = !!user?.avatar_id;
 
   const menuItems = [
     [
@@ -128,25 +285,58 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <View style={dynamicStyles.screen}>
-      {(!acceptedTerms) && <CurvedHeaderBackground />}
+    <View style={[dynamicStyles.screen, { backgroundColor: theme.background }]}>
+      {(!user?.avatar_id) && <CurvedHeaderBackground />}
       <ScrollView
-        contentContainerStyle={[styles.scrollContainer, { paddingTop: insets.top + 10 }]}
+        contentContainerStyle={[styles.scrollContainer, { paddingTop: insets.top + 10, backgroundColor: theme.background }]}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.profileSection}>
-          {acceptedTerms ? (
+          {hasAcceptedProTerms ? (
+            // Professional view (microsite buttons, analytics, etc.)
             <>
               <View style={styles.profileHeaderRow}>
                 <View style={[styles.avatarContainer, styles.compactAvatar]}>
-                  <Image
-                    source={{ uri: 'https://wallpapers.com/images/hd/sadhguru-sitting-and-smilling-4grkugynnnp8zhf2.jpg' }}
-                    style={styles.avatarImage}
-                  />
+                  {professionalImageUrl ? (
+                    <Image
+                      source={{
+                        uri: applyPreset(professionalImageUrl, 'profileAvatar', 55) || undefined
+                      }}
+                      style={styles.avatarImage}
+                      onError={() => {
+                        console.log('Failed to load professional image');
+                        setProfessionalImageUrl(null);
+                      }}
+                    />
+                  ) : avatarImageUrl ? (
+                    <Image
+                      source={{
+                        uri: applyPreset(avatarImageUrl, 'profileAvatar', 55) || undefined
+                      }}
+                      style={styles.avatarImage}
+                      onError={() => {
+                        console.log('Failed to load avatar image');
+                        setAvatarImageUrl(null);
+                      }}
+                    />
+                  ) : avatar?.avatarUrl ? (
+                    <Image
+                      source={{
+                        uri: applyPreset(avatar.avatarUrl, 'profileAvatar', 55) || undefined
+                      }}
+                      style={styles.avatarImage}
+                      onError={() => console.log('Failed to load avatar image')}
+                    />
+                  ) : (
+                    <View style={[styles.avatarImage, { backgroundColor: '#E0E0E0', justifyContent: 'center', alignItems: 'center' }]}>
+                      <Ionicons name="person" size={55} color="#999" />
+                    </View>
+                  )}
                 </View>
                 <View style={styles.profileInfoContainer}>
-                  <Text style={[styles.userName, dynamicStyles.userName, styles.leftAlignedText]}>Sadhguru</Text>
-                  <Text style={[styles.subscriberCount, dynamicStyles.subscriberCount, styles.leftAlignedText]}>0</Text>
+                  <Text style={[styles.userName, dynamicStyles.userName, styles.leftAlignedText]}>{professionalData?.display_name || displayName}</Text>
+                  <Text style={[styles.userInfo, dynamicStyles.userInfo, styles.leftAlignedText, { marginTop: 4, marginBottom: 8 }]}>{user?.email || ''}</Text>
+                  <Text style={[styles.subscriberCount, dynamicStyles.subscriberCount, styles.leftAlignedText]}>{professionalData?.subscriber_count || 0}</Text>
                   <Text style={[styles.subscriberLabel, dynamicStyles.subscriberLabel, styles.leftAlignedText]}>Total subscribers</Text>
                 </View>
               </View>
@@ -177,15 +367,58 @@ export default function ProfileScreen() {
               </View>
             </>
           ) : (
+            // Basic view (upgrade button, basic info)
             <>
               <View style={styles.avatarContainer}>
-                <Image
-                  source={{ uri: 'https://api.builder.io/api/v1/image/assets/TEMP/5937cf43b006e61aa7a9f8703a57c7d87d14019f?width=221' }}
-                  style={styles.avatarImage}
-                />
+                {(() => {
+                  console.log('🖼️ Avatar render check:', {
+                    avatarImageUrl,
+                    'avatar?.avatarUrl': avatar?.avatarUrl,
+                    'avatar object': avatar
+                  });
+
+                  if (avatarImageUrl) {
+                    console.log('✅ Using avatarImageUrl:', avatarImageUrl);
+                    return (
+                      <Image
+                        source={{
+                          uri: applyPreset(avatarImageUrl, 'profileAvatar', 85) || undefined
+                        }}
+                        style={styles.avatarImage}
+                        onError={(error) => {
+                          console.log('❌ Failed to load avatar image from avatarImageUrl:', error.nativeEvent.error);
+                          setAvatarImageUrl(null);
+                        }}
+                        onLoad={() => console.log('✅ Avatar image loaded successfully from avatarImageUrl')}
+                      />
+                    );
+                  } else if (avatar?.avatarUrl) {
+                    console.log('✅ Using avatar.avatarUrl:', avatar.avatarUrl);
+                    return (
+                      <Image
+                        source={{
+                          uri: applyPreset(avatar.avatarUrl, 'profileAvatar', 85) || undefined
+                        }}
+                        style={styles.avatarImage}
+                        onError={(error) => {
+                          console.log('❌ Failed to load avatar image from avatar.avatarUrl:', error.nativeEvent.error);
+                        }}
+                        onLoad={() => console.log('✅ Avatar image loaded successfully from avatar.avatarUrl')}
+                      />
+                    );
+                  } else {
+                    console.log('⚠️ No avatar URL available, showing placeholder');
+                    return (
+                      <View style={[styles.avatarImage, { backgroundColor: '#E0E0E0', justifyContent: 'center', alignItems: 'center' }]}>
+                        <Ionicons name="person" size={85} color="#999" />
+                      </View>
+                    );
+                  }
+                })()}
               </View>
-              <Text style={[styles.userName, dynamicStyles.userName]}>Arya</Text>
-              <Text style={[styles.userInfo, dynamicStyles.userInfo]}>arya0077@gmail.com | +91 1234567890</Text>
+              <Text style={[styles.userName, dynamicStyles.userName]}>{displayName}</Text>
+              <Text style={[styles.userInfo, dynamicStyles.userInfo, { marginTop: 4 }]}>{user?.email || ''}</Text>
+              {user?.mobile && <Text style={[styles.userInfo, dynamicStyles.userInfo, { marginTop: 2 }]}>{user?.mobile || ''}</Text>}
               <TouchableOpacity
                 style={styles.upgradeButtonContainer}
                 onPress={() => navigation.navigate('SeePlans')}
@@ -224,6 +457,15 @@ export default function ProfileScreen() {
                         } else if (item.label === 'Edit profile information') {
                           navigation.navigate('EditProfile');
                         } else if (item.label === 'Avatar') {
+                          // ✅ Check if user has an avatar before navigating
+                          if (!user?.avatar_id) {
+                            Alert.alert(
+                              'No Avatar',
+                              'You haven\'t created an avatar yet. Please complete the onboarding flow to create one.',
+                              [{ text: 'OK' }]
+                            );
+                            return;
+                          }
                           navigation.navigate('Avatar');
                         } else if (item.label === 'Change Password') {
                           navigation.navigate('PasswordChange');
@@ -239,6 +481,30 @@ export default function ProfileScreen() {
                           navigation.navigate('DeleteAccount');
                         } else if (item.label === 'Support') {
                           navigation.navigate('SupportPage');
+                        } else if (item.label === 'Logout') {
+                          // ✅ Handle logout: clear Zustand state and navigate to Onboarding
+                          Alert.alert(
+                            'Logout',
+                            'Are you sure you want to logout?',
+                            [
+                              {
+                                text: 'Cancel',
+                                style: 'cancel'
+                              },
+                              {
+                                text: 'Logout',
+                                style: 'destructive',
+                                onPress: () => {
+                                  console.log('🚪 User logging out...');
+                                  logout();
+                                  navigation.reset({
+                                    index: 0,
+                                    routes: [{ name: 'OnboardingScreen1' }],
+                                  });
+                                }
+                              }
+                            ]
+                          );
                         }
                       }}
                     >
@@ -256,11 +522,11 @@ export default function ProfileScreen() {
                       </View>
                       {'hasToggle' in item && item.hasToggle ? (
                         <Switch
-                          trackColor={{ false: '#D1D5DB', true: '#6C5CE7' }}
-                          thumbColor={'#f4f3f4'}
-                          ios_backgroundColor="#D1D5DB"
-                          onValueChange={() => setTheme(isDarkTheme ? 'light' : 'dark')}
-                          value={isDarkTheme}
+                          trackColor={{ false: theme.border, true: theme.primary }}
+                          thumbColor={theme.cardBackground}
+                          ios_backgroundColor={theme.border}
+                          onValueChange={toggleDarkMode}
+                          value={isDarkMode}
                           style={{ transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }] }}
                         />
                       ) : (
@@ -296,22 +562,22 @@ const styles = StyleSheet.create({
     // Remove width restriction if present
   },
   scrollContainer: {
-    paddingBottom: 100,
+    paddingBottom: 90,
   },
   profileSection: {
     zIndex: 10,
     alignItems: 'center',
-    paddingBottom: 24,
+    paddingBottom: 21.6,
   },
   avatarContainer: {
-    width: 141,
-    height: 141,
-    borderRadius: 70.5,
+    width: 153,
+    height: 153,
+    borderRadius: 76.5,
     borderWidth: 4,
     borderColor: 'white',
-    marginBottom: 16,
+    marginBottom: 14.4,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 3.6 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 8,
@@ -319,29 +585,30 @@ const styles = StyleSheet.create({
   avatarImage: {
     width: '100%',
     height: '100%',
-    borderRadius: 70.5,
+    borderRadius: 76.5,
   },
   userName: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    marginBottom: 2,
+    marginBottom: 1.8,
     fontFamily: 'Inter-Bold',
     textAlign: 'center',
   },
   userInfo: {
-    fontSize: 14,
+    fontSize: 12.6,
     textAlign: 'center',
     fontFamily: 'Roboto-Medium',
+    marginBottom: 3.6,
   },
   upgradeButtonContainer: {
-    marginTop: 24,
-    width: 335,
+    marginTop: 21.6,
+    width: 301.5,
     backgroundColor: '#483D97',
-    borderRadius: 8,
-    height: 62,
+    borderRadius: 7.2,
+    height: 55.8,
     elevation: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 3.6 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
   },
@@ -349,26 +616,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: 14.4,
     flex: 1,
   },
   // upgradeButtonLeft already defined above
   analyticsRowExact: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     width: '100%',
-    marginBottom: 8,
+    marginBottom: 5.4,
     marginTop: 0,
     paddingHorizontal: 0,
+    gap: 14.4,
   },
   analyticsCardExact: {
-    borderRadius: 12,
-    paddingVertical: 18,
-    paddingHorizontal: 18,
+    borderRadius: 9,
+    paddingVertical: 12.6,
+    paddingHorizontal: 12.6,
     alignItems: 'flex-start',
     justifyContent: 'center',
-    width: 190,
-    height: 80,
+    width: 153,
+    height: 61.2,
     shadowColor: '#000',
     shadowOpacity: 0.04,
     shadowRadius: 4,
@@ -376,37 +644,38 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   analyticsLabelExact: {
-    fontSize: 13,
-    marginBottom: 2,
+    fontSize: 10.8,
+    marginBottom: 1.8,
     fontWeight: '500',
   },
   analyticsValueExact: {
-    fontSize: 18,
+    fontSize: 14.4,
     fontWeight: '700',
-    marginTop: 2,
+    marginTop: 1.8,
   },
   buttonRowExact: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginTop: 8,
-    marginBottom: 8,
+    justifyContent: 'center',
+    width: '95%',
+    marginTop: 5.4,
+    marginBottom: 5.4,
     paddingHorizontal: 0,
+    gap: 1,
   },
   micrositeBtnExact: {
     backgroundColor: '#8170FF',
-    borderRadius: 8,
-    paddingVertical: 12,
+    borderRadius: 7.2,
+    paddingVertical: 9,
     paddingHorizontal: 0,
-    height: 45,
+    height: 36,
     flex: 1,
-    marginHorizontal: 10,
+    marginHorizontal: 7.2,
     alignItems: 'center',
     minWidth: 0,
   },
   micrositeBtnTextExact: {
     color: '#fff',
-    fontSize: 15,
+    fontSize: 12.6,
     fontWeight: '700',
     fontFamily: 'Outfit-Bold',
     textAlign: 'center',
@@ -414,46 +683,46 @@ const styles = StyleSheet.create({
   upgradeButtonLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 14.4,
   },
   upgradeIconContainer: {
-    width: 104,
-    height: 48,
-    borderRadius: 8,
+    width: 93.6,
+    height: 43.2,
+    borderRadius: 7.2,
     alignItems: 'center',
     justifyContent: 'center',
   },
   upgradeIconText: {
-    fontSize: 24,
+    fontSize: 21.6,
   },
   upgradeText: {
-    fontSize: 24,
+    fontSize: 21.6,
     color: '#E8A23D',
     fontFamily: 'Outfit-SemiBold',
   },
   subscriberCount: {
-    fontSize: 20,
+    fontSize: 16.2,
     fontWeight: '700',
     textAlign: 'center',
-    marginBottom: 2,
+    marginBottom: 1.8,
   },
   subscriberLabel: {
-    fontSize: 14,
+    fontSize: 11.7,
     textAlign: 'center',
-    marginBottom: 18,
+    marginBottom: 12.6,
   },
   analyticsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 2,
-    marginTop: 2,
+    marginBottom: 1.8,
+    marginTop: 1.8,
     width: '100%',
-    paddingHorizontal: 10,
+    paddingHorizontal: 9,
   },
   analyticsCard: {
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
+    borderRadius: 10.8,
+    paddingVertical: 14.4,
+    paddingHorizontal: 21.6,
     alignItems: 'flex-start',
     justifyContent: 'center',
     width: '48%',
@@ -464,11 +733,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   analyticsLabel: {
-    fontSize: 13,
-    marginBottom: 4,
+    fontSize: 11.7,
+    marginBottom: 3.6,
   },
   analyticsValue: {
-    fontSize: 18,
+    fontSize: 16.2,
     fontWeight: '700',
   },
   analyticsFooterRow: {
@@ -476,73 +745,73 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    paddingHorizontal: 10,
-    marginBottom: 18,
-    marginTop: 8,
+    paddingHorizontal: 7.2,
+    marginBottom: 12.6,
+    marginTop: 5.4,
   },
   analyticsFooter: {
-    fontSize: 15,
+    fontSize: 12.6,
     fontWeight: '700',
   },
   analyticsFooterRight: {
-    fontSize: 13,
+    fontSize: 10.8,
     fontWeight: '500',
   },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    paddingHorizontal: 10,
-    marginBottom: 18,
+    paddingHorizontal: 9,
+    marginBottom: 16.2,
   },
   micrositeBtn: {
     backgroundColor: '#8170FF',
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
+    borderRadius: 7.2,
+    paddingVertical: 10.8,
+    paddingHorizontal: 9,
     flex: 1,
-    marginHorizontal: 4,
+    marginHorizontal: 3.6,
     alignItems: 'center',
   },
   micrositeBtnText: {
     color: '#fff',
-    fontSize: 15,
+    fontSize: 13.5,
     fontWeight: '700',
     fontFamily: 'Outfit-Bold',
   },
   settingsContainer: {
-    paddingHorizontal: 28,
+    paddingHorizontal: 25.2,
     zIndex: 10,
   },
   menuSectionsWrapper: {
-    gap: 24,
+    gap: 21.6,
   },
   menuSection: {
-    borderRadius: 8,
+    borderRadius: 7.2,
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 0.9 },
     shadowOpacity: 0.1,
     shadowRadius: 1,
   },
   menuSectionInner: {
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    gap: 24,
+    paddingHorizontal: 21.6,
+    paddingVertical: 14.4,
+    gap: 21.6,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    minHeight: 18,
+    minHeight: 16.2,
   },
   menuItemLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 14.4,
   },
   menuItemLabel: {
-    fontSize: 14,
+    fontSize: 12.6,
     fontFamily: 'Outfit-Regular',
   },
   destructiveText: {
@@ -553,14 +822,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    marginBottom: 8,
-    marginRight: -30,
+    marginBottom: 5.4,
+    marginRight: -24,
   },
   compactAvatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 45,
-    marginRight: 20,
+    width: 99,
+    height: 99,
+    borderRadius: 49.5,
+    marginRight: 14.4,
     marginBottom: 0,
   },
   profileInfoContainer: {
@@ -571,24 +840,24 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   analyticsCardWithMargin: {
-    marginLeft: 10,
+    marginLeft: 7.2,
   },
   analyticsCardRightMargin: {
-    marginRight: 10,
+    marginRight: 7.2,
   },
   upgradeIconYellow: {
     backgroundColor: '#FDE047',
   },
   conditionalMinHeight: {
-    minHeight: 142, // default, will be overridden conditionally
+    minHeight: 127.8, // default, will be overridden conditionally
   },
   conditionalMinHeightShort: {
-    minHeight: 112,
+    minHeight: 100.8,
   },
   noMarginLeft: {
     marginLeft: 0,
   },
   bottomSpacing: {
-    marginBottom: 25,
+    marginBottom: 31.5,
   },
 });

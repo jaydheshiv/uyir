@@ -43,16 +43,16 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 60,
-    left: 10,
+    top: 54,
+    left: 9,
     zIndex: 10,
     backgroundColor: 'transparent',
-    padding: 8,
+    padding: 7.2,
   },
   mobileLayout: {
     flex: 1,
     justifyContent: 'flex-start',
-    paddingTop: 100,
+    paddingTop: 90,
   },
   tabletLayout: {
     flex: 1,
@@ -60,24 +60,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     minHeight: '100%',
-    paddingTop: 100,
+    paddingTop: 90,
   },
   formCard: {
     width: '100%',
-    maxWidth: 400,
+    maxWidth: 360,
     backgroundColor: '#fff',
-    borderRadius: 16,
+    borderRadius: 14.4,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 8,
+      height: 7.2,
     },
     shadowOpacity: 0.15,
     shadowRadius: 16,
     elevation: 8,
     overflow: 'hidden',
-    padding: 24,
+    padding: 21.6,
   },
 });
 
 export default BasicDetails;
+

@@ -1,19 +1,14 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Platform } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import React from 'react';
+import { Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 
 const { width } = Dimensions.get('window');
 
-// Replace 'RootStackParamList' with your actual stack param list type
-type RootStackParamList = {
-  CreateAvatar3: undefined;
-  // add other screens here if needed
-};
-
 const PaymentSuccessful: React.FC = () => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList, 'CreateAvatar3'>>();
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
   return (
     <View style={styles.container}>
@@ -39,7 +34,7 @@ const PaymentSuccessful: React.FC = () => {
         {/* CTA Button */}
         <TouchableOpacity
           style={styles.ctaButton}
-          onPress={() => navigation.navigate('CreateAvatar3')}
+          onPress={() => navigation.navigate('LetUsKnowYou')}
         >
           <Text style={styles.ctaButtonText}>Create Your Twin</Text>
         </TouchableOpacity>
@@ -58,65 +53,66 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 24,
+    paddingHorizontal: 18,
   },
   circlesContainer: {
-    marginBottom: 60,
+    marginBottom: 36,
     alignItems: 'center',
     justifyContent: 'center',
   },
   outerCircle: {
-    width: 320,
-    height: 320,
-    borderRadius: 160,
+    width: 234,
+    height: 234,
+    borderRadius: 117,
     backgroundColor: '#D8F5E6', // success-lighter
     alignItems: 'center',
     justifyContent: 'center',
   },
   middleCircle: {
-    width: 240,
-    height: 240,
-    borderRadius: 120,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
     backgroundColor: '#A3E9C7', // success-light
     alignItems: 'center',
     justifyContent: 'center',
   },
   innerCircle: {
-    width: 180,
-    height: 180,
-    borderRadius: 90,
+    width: 135,
+    height: 135,
+    borderRadius: 67.5,
     backgroundColor: '#22C55E', // success
     alignItems: 'center',
     justifyContent: 'center',
   },
   successMessage: {
     alignItems: 'center',
-    marginBottom: 60,
+    marginBottom: 36,
   },
   successTitle: {
-    fontSize: 28,
+    fontSize: 21.6,
     fontWeight: '700',
     color: '#22C55E',
-    marginBottom: 10,
+    marginBottom: 7.2,
     fontFamily: Platform.OS === 'ios' ? 'Outfit-Bold' : undefined,
   },
   successSubtitle: {
-    fontSize: 18,
+    fontSize: 14.4,
     color: '#222',
     fontFamily: Platform.OS === 'ios' ? 'Outfit-Regular' : undefined,
   },
   ctaButton: {
-    width: width - 48,
+    width: width - 40,
     backgroundColor: '#8170FF',
-    paddingVertical: 18,
-    borderRadius: 32,
+    paddingVertical: 13.5,
+    borderRadius: 23.4,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: -150,
+    marginBottom: -30,
+    bottom: -90,
   },
   ctaButtonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 14.4,
     fontWeight: '600',
     fontFamily: Platform.OS === 'ios' ? 'Outfit-Medium' : undefined,
   },

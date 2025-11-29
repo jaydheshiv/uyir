@@ -163,35 +163,35 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: 24,
+    paddingHorizontal: 21.6,
   },
   formContainer: {
     flex: 1,
-    paddingTop: 10,
+    paddingTop: 9,
   },
   title: {
-    fontSize: 28,
+    fontSize: 25.2,
     fontWeight: '500',
     color: '#000',
-    marginBottom: 30,
+    marginBottom: 27,
     textAlign: 'left',
   },
   label: {
-    fontSize: 16,
+    fontSize: 14.4,
     color: '#000',
-    marginBottom: 8,
-    marginTop: 10,
+    marginBottom: 7.2,
+    marginTop: 9,
     fontWeight: '400',
   },
   input: {
     width: '100%',
-    height: 50,
+    height: 45,
     backgroundColor: '#fff',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    fontSize: 16,
+    borderRadius: 7.2,
+    paddingHorizontal: 14.4,
+    fontSize: 14.4,
     color: '#000',
-    marginBottom: 8,
+    marginBottom: 7.2,
     borderWidth: 3,
   },
   inputEmpty: {
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dateText: {
-    fontSize: 16,
+    fontSize: 14.4,
   },
   dateTextEmpty: {
     color: '#9CA3AF', // Grey text when empty
@@ -213,11 +213,11 @@ const styles = StyleSheet.create({
     color: '#000', // Black text when filled
   },
   continueButton: {
-    borderRadius: 25,
-    paddingVertical: 16,
+    borderRadius: 22.5,
+    paddingVertical: 14.4,
     alignItems: 'center',
-    marginTop: 400,
-    marginBottom: 40,
+    marginTop: 360,
+    marginBottom: 36,
   },
   continueButtonInactive: {
     backgroundColor: '#D1D5DB', // Grey when inactive
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#A0A0A0',
   },
   continueButtonText: {
-    fontSize: 17,
+    fontSize: 15.3,
     fontWeight: '600',
   },
   continueButtonTextInactive: {

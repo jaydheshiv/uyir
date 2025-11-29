@@ -22,7 +22,7 @@ const BackButton: React.FC<BackButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    width: 32,
+    width: 28.8,
     alignItems: 'flex-start',
     zIndex: 2,
     padding: 0,

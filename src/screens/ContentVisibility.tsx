@@ -1,9 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { Edit } from 'lucide-react-native';
+import React from 'react';
+import { StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import CustomBottomNav from '../components/CustomBottomNav';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
 
 type RootStackParamList = {
   CvKnowledgeBase: undefined;
@@ -50,10 +50,10 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 60,
-    paddingHorizontal: 24,
-    paddingBottom: 0,
-    marginLeft: -80,
+    paddingTop: 49.5,
+    paddingHorizontal: 18,
+    paddingBottom: -30,
+    marginLeft: -64,
     backgroundColor: '#F7F7F7',
     justifyContent: 'space-between',
   },
@@ -63,40 +63,40 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   backBtn: {
-    padding: 1,
-    borderRadius: 20,
-    marginBottom: 80,
-    marginLeft: 70,
+    padding: 0.9,
+    borderRadius: 16.2,
+    marginBottom: 75.6,
+    marginLeft: 60.4,
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 21.6,
     fontWeight: 'bold',
     color: '#222',
     flex: 1,
     textAlign: 'left',
-    marginLeft: -30,
-    marginTop: 10,
+    marginLeft: -24,
+    marginTop: 7.2,
     fontFamily: 'Outfit',
   },
   editIcon: {
-    padding: 4,
-    borderRadius: 20,
-    marginBottom: 80,
-    marginLeft: 70,
+    padding: 2.7,
+    borderRadius: 16.2,
+    marginBottom: 75.6,
+    marginLeft: 50.4,
   },
   menuWrapper: {
-    paddingHorizontal: 16,
-    paddingTop: 32,
-    paddingBottom: 24,
+    paddingHorizontal: 10.8,
+    paddingTop: 0,
+    paddingBottom: 18,
   },
   menuBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: 20,
-    paddingVertical: 28,
-    paddingHorizontal: 24,
-    marginBottom: 24,
+    borderRadius: 16.2,
+    paddingVertical: 21.6,
+    paddingHorizontal: 18,
+    marginBottom: 18,
     elevation: 2,
     shadowColor: '#000',
     shadowOpacity: 0.04,
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   },
   menuText: {
     flex: 1,
-    fontSize: 22,
+    fontSize: 17.1,
     fontWeight: 'bold',
     color: '#222',
     fontFamily: 'Outfit',
@@ -113,12 +113,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: 20,
+    bottom: 22.5,
     backgroundColor: '#fff',
     paddingTop: 0,
-    paddingBottom: 8,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    paddingBottom: 10,
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
     elevation: 10,
     shadowColor: '#000',
     shadowOpacity: 0.08,

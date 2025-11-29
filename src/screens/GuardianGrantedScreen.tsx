@@ -55,43 +55,43 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 24,
+    paddingHorizontal: 21.6,
   },
   illustrationContainer: {
     marginTop: Platform.OS === 'ios' ? 60 : 40,
-    marginBottom: 32,
+    marginBottom: 28.8,
     alignItems: 'center',
     width: '100%',
   },
   illustration: {
-    width: 170,
-    height: 201,
+    width: 153,
+    height: 180.9,
   },
   messageContainer: {
-    marginBottom: 48,
+    marginBottom: 43.2,
     alignItems: 'center',
     width: '100%',
-    paddingHorizontal: 8,
+    paddingHorizontal: 7.2,
   },
   messageText: {
     color: '#000',
-    fontSize: 18,
+    fontSize: 16.2,
     textAlign: 'center',
     fontFamily: Platform.OS === 'ios' ? 'Outfit' : undefined,
   },
   ctaButton: {
     width: '100%',
-    maxWidth: 345,
-    height: 56,
+    maxWidth: 310.5,
+    height: 50.4,
     backgroundColor: '#8170FF',
-    borderRadius: 28,
+    borderRadius: 25.2,
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
   },
   ctaButtonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16.2,
     fontWeight: '500',
   },
   loadingContainer: {
@@ -100,8 +100,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   loadingIndicator: {
-    marginRight: 8,
+    marginRight: 7.2,
   },
 });
 
 export default GuardianGrantedScreen;
+

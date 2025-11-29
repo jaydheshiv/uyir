@@ -1,17 +1,18 @@
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LabeledInput from '../components/LabeledInput';
-import PrimaryButton from '../components/PrimaryButton';
 
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import { useAuth } from '../store/useAppStore';
 
 export default function SignupFlow() {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const { setUser, resetOnboardingState } = useAuth();
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,13 +37,26 @@ export default function SignupFlow() {
       if (email) body.email = email;
       if (phone) body.mobile = phone.startsWith('+91') ? phone : `+91${phone}`;
 
-      const response = await fetch('http://10.0.2.2:8000/auth/signup', {
+      const response = await fetch('http://dev.api.uyir.ai:8081/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
       const data = await response.json();
+      console.log('📝 === SIGNUP RESPONSE ===');
+      console.log('📝 Full response:', JSON.stringify(data, null, 2));
+      console.log('📝 User ID:', data.user_id);
+      console.log('📝 OTP for testing:', data.otp_for_testing || data.otp);
+
       if (response.ok) {
+        // ✅ Reset onboarding state for new user (clear any old data)
+        resetOnboardingState();
+
+        // Store user_id in Zustand
+        console.log('💾 Storing user_id in Zustand:', data.user_id);
+        setUser({ user_id: data.user_id });
+        console.log('✅ User ID saved to Zustand - will be preserved during OTP verification');
+
         Alert.alert('Verification', 'Verification code sent successfully!');
         if (email) {
           navigation.navigate('OTPVerificationScreen', { code: data.otp, email });
@@ -50,7 +64,50 @@ export default function SignupFlow() {
           navigation.navigate('OTPVerificationPhoneScreen', { code: data.otp, mobile: phone.startsWith('+91') ? phone : `+91${phone}` });
         }
       } else {
-        Alert.alert('Error', typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail));
+        // Handle specific error cases
+        const errorMessage = typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
+
+        if (errorMessage.toLowerCase().includes('already exists')) {
+          // User exists but might not be verified - allow them to complete verification
+          Alert.alert(
+            'Account Exists',
+            'An account with this email/mobile already exists but may not be verified. Unfortunately, the backend cannot resend OTP to unverified accounts.\n\nOptions:\n1. Contact support to manually verify your account\n2. Ask backend team to add OTP resend feature',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Try OTP Screen',
+                onPress: () => {
+                  // Let user try OTP screen anyway in case they have the code
+                  Alert.alert(
+                    'Manual Entry',
+                    'You will be taken to the OTP screen. If you still have the OTP from your original signup, you can enter it there.',
+                    [
+                      { text: 'Cancel', style: 'cancel' },
+                      {
+                        text: 'Continue',
+                        onPress: () => {
+                          if (email) {
+                            navigation.navigate('OTPVerificationScreen', {
+                              code: '',
+                              email
+                            });
+                          } else if (phone) {
+                            navigation.navigate('OTPVerificationPhoneScreen', {
+                              code: '',
+                              mobile: phone.startsWith('+91') ? phone : `+91${phone}`
+                            });
+                          }
+                        }
+                      }
+                    ]
+                  );
+                }
+              }
+            ]
+          );
+        } else {
+          Alert.alert('Error', errorMessage);
+        }
       }
     } catch (err) {
       Alert.alert('Network error', 'Please try again later.');
@@ -72,10 +129,7 @@ export default function SignupFlow() {
       <Text style={styles.subTitle}>
         Create an Uyir account
       </Text>
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-      >
+      <View style={styles.contentContainer}>
         {/* Email */}
         <LabeledInput
           label="Email"
@@ -146,107 +200,109 @@ export default function SignupFlow() {
         </Text>
 
         <View style={styles.buttonContainer}>
-          <PrimaryButton
-            title={loading ? 'Sending...' : 'Continue'}
+          <TouchableOpacity
+            style={[styles.loginButton, styles.marginTop16, loading && styles.opacity06]}
             onPress={handleSignup}
             disabled={loading}
-            style={styles.primaryButton}
-          />
+          >
+            <Text style={styles.loginButtonText}>{loading ? 'Sending...' : 'Continue'}</Text>
+          </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.socialButton, styles.socialButtonSpacing]}>
+          <TouchableOpacity style={styles.socialButton}>
             <FontAwesome name="google" size={20} color="#8170FF" style={styles.socialIcon} />
             <Text style={styles.socialButtonText}>Continue with Google</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.socialButton, styles.socialButtonLast]}>
+          <TouchableOpacity style={styles.socialButton}>
             <FontAwesome name="apple" size={22} color="#8170FF" style={styles.socialIcon} />
             <Text style={styles.socialButtonText}>Continue with Apple</Text>
           </TouchableOpacity>
         </View>
 
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
-  label: { fontSize: 16, color: '#000', marginBottom: 8, marginTop: 12 },
+  label: { fontSize: 12.6, color: '#000', marginBottom: 5.4, marginTop: 7.2 },
   input: {
-    height: 48,
+    height: 39.6,
     borderWidth: 1,
     borderColor: '#D6D6D6',
-    borderRadius: 12,
-    paddingHorizontal: 12,
+    borderRadius: 10.8,
+    paddingHorizontal: 10.8,
     backgroundColor: '#fff',
-    fontSize: 16,
-    marginBottom: 8,
+    fontSize: 12.6,
+    marginBottom: 5.4,
   },
-  passwordHint: { color: '#666', fontSize: 12, marginTop: 4, marginBottom: 8 },
-  dividerRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 16 },
-  divider: { flex: 1, height: 1, backgroundColor: '#000' },
-  orText: { marginHorizontal: 12, color: '#000', fontSize: 16 },
-  phoneRow: { flexDirection: 'row', alignItems: 'flex-end', marginBottom: 8 },
+  passwordHint: { color: '#666', fontSize: 9.9, marginTop: 1.8, marginBottom: 5.4 },
+  dividerRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 10.8 },
+  divider: { flex: 1, height: 0.9, backgroundColor: '#D6D6D6' },
+  orText: { marginHorizontal: 10.8, color: '#A8A8A8', fontSize: 12.6 },
+  phoneRow: { flexDirection: 'row', alignItems: 'flex-end', marginBottom: 5.4 },
   flagBox: {
-    width: 48,
-    height: 48,
+    width: 39.6,
+    height: 39.6,
     borderWidth: 1,
     borderColor: '#000',
-    borderRadius: 12,
+    borderRadius: 10.8,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 4,
+    marginRight: 3.6,
     backgroundColor: '#fff',
   },
-  countryCode: { fontSize: 16, color: '#A8A8A8', marginRight: 4, alignSelf: 'flex-end', paddingBottom: 12 },
+  countryCode: { fontSize: 12.6, color: '#A8A8A8', marginRight: 3.6, alignSelf: 'flex-end', paddingBottom: 10.8 },
   phoneInput: {
     flex: 1,
-    height: 48,
+    height: 39.6,
     borderWidth: 1,
     borderColor: '#D6D6D6',
-    borderRadius: 12,
-    paddingHorizontal: 12,
+    borderRadius: 10.8,
+    paddingHorizontal: 10.8,
     backgroundColor: '#fff',
-    fontSize: 16,
+    fontSize: 12.6,
   },
-  flagContainer: { width: 24, height: 17, borderRadius: 3, overflow: 'hidden', justifyContent: 'center', alignItems: 'center' },
-  flagStripe: { width: 24, height: 5 },
-  flagCircle: { position: 'absolute', top: 6, left: 10, width: 4, height: 4, borderRadius: 2, backgroundColor: '#000088' },
-  phoneHint: { color: '#A8A8A8', fontSize: 12, marginTop: 4, marginBottom: 8 },
-  termsText: { color: '#8F8F8F', fontSize: 12, textAlign: 'left', marginTop: 8, marginBottom: 16 },
-  termsLink: { fontSize: 14, color: '#8170FF', textDecorationLine: 'underline' },
-  sendButton: {
+  flagContainer: { width: 21.6, height: 15.3, borderRadius: 2.7, overflow: 'hidden', justifyContent: 'center', alignItems: 'center' },
+  flagStripe: { width: 21.6, height: 4.5 },
+  flagCircle: { position: 'absolute', top: 5.4, left: 9, width: 3.6, height: 3.6, borderRadius: 1.8, backgroundColor: '#000088' },
+  phoneHint: { color: '#A8A8A8', fontSize: 9.9, marginTop: 1.8, marginBottom: 5.4 },
+  termsText: { color: '#8F8F8F', fontSize: 9.9, textAlign: 'left', marginTop: 5.4, marginBottom: 10.8 },
+  termsLink: { fontSize: 10.8, color: '#8170FF', textDecorationLine: 'underline' },
+  loginButton: {
     width: '100%',
-    height: 48,
+    height: 45,
     backgroundColor: '#8170FF',
-    borderRadius: 24,
+    borderRadius: 21.6,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginTop: 14.4,
   },
-  sendButtonText: { color: '#fff', fontSize: 16, fontWeight: '500' },
+  loginButtonText: { color: '#fff', fontSize: 12.6, fontWeight: '500' },
   socialButton: {
     width: '100%',
-    height: 48,
-    borderRadius: 24,
+    height: 45,
+    borderRadius: 21.6,
     borderWidth: 1,
     borderColor: '#8170FF',
     backgroundColor: '#fff',
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
-    paddingHorizontal: 80,
+    justifyContent: 'center',
+    marginTop: 10,
+    paddingHorizontal: 18,
   },
   socialIcon: {
-    fontSize: 20,
+    fontSize: 16.2,
     color: '#8170FF',
-    marginRight: 12,
-    width: 24,
+    marginRight: 7.2,
+    width: 18,
     textAlign: 'center',
   },
   socialButtonText: {
     color: '#8170FF',
-    fontSize: 16,
+    fontSize: 12.6,
     fontWeight: '500',
   },
   // New styles for alignment fixes
@@ -258,12 +314,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingHorizontal: 20,
-    marginTop: 22,
-    marginBottom: 12,
+    paddingHorizontal: 18,
+    marginTop: 30,
+    marginBottom: 10.8,
   },
   backButton: {
-    width: 32,
+    width: 28.8,
     alignItems: 'flex-start',
     zIndex: 2,
   },
@@ -275,38 +331,38 @@ const styles = StyleSheet.create({
     right: 0,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 14.4,
     fontWeight: '400',
     color: '#000',
     textAlign: 'center',
   },
   subTitle: {
-    fontSize: 18,
+    fontSize: 14.4,
     fontWeight: '700',
     color: '#000',
-    marginLeft: 20,
-    marginTop: 12,
-    marginBottom: 18,
+    marginLeft: 18,
+    marginTop: 7.2,
+    marginBottom: 10.8,
   },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 32,
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 18,
+    paddingTop: 7.2,
+    paddingBottom: 14.4,
   },
   passwordContainer: {
     position: 'relative',
-    marginBottom: 8,
+    marginBottom: 7.2,
   },
   passwordInput: {
-    paddingRight: 36,
+    paddingRight: 32.4,
   },
   eyeButton: {
     position: 'absolute',
-    right: 12,
-    top: 38,
-    height: 32,
-    width: 32,
+    right: 10.8,
+    top: 34.2,
+    height: 28.8,
+    width: 28.8,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -324,19 +380,17 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   phoneInputStyle: {
-    height: 48,
+    height: 39.6,
     marginBottom: 0,
   },
   buttonContainer: {
-    marginTop: 4,
+    marginTop: 3.6,
   },
-  primaryButton: {
-    marginBottom: 16,
+  marginTop16: {
+    marginTop: 20,
   },
-  socialButtonSpacing: {
-    marginBottom: 16,
-  },
-  socialButtonLast: {
-    marginBottom: 0,
+  opacity06: {
+    opacity: 0.6,
   },
 });
+

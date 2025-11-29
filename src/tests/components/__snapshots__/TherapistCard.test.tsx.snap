@@ -1,0 +1,294 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TherapistCard Component matches snapshot 1`] = `
+<View
+  style={
+    {
+      "backgroundColor": "#E7E3FF",
+      "borderRadius": 18,
+      "marginBottom": 18,
+      "marginTop": 1.8,
+      "overflow": "hidden",
+      "shadowColor": "#000",
+      "shadowOffset": {
+        "height": 1.8,
+        "width": 0,
+      },
+      "shadowOpacity": 0.1,
+      "shadowRadius": 8,
+    }
+  }
+>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "padding": 16.2,
+        "paddingBottom": 8.1,
+      }
+    }
+  >
+    <Image
+      resizeMode="cover"
+      source={
+        {
+          "uri": "https://example.com/avatar.jpg",
+        }
+      }
+      style={
+        {
+          "backgroundColor": "#ccc",
+          "borderRadius": 18,
+          "height": 81,
+          "marginRight": 7.2,
+          "width": 81,
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "alignItems": "flex-start",
+          "flex": 1,
+          "justifyContent": "center",
+          "marginLeft": 12,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#222",
+            "fontSize": 18,
+            "fontWeight": "600",
+            "marginBottom": 3.6,
+            "textAlign": "left",
+          }
+        }
+      >
+        Dr. Jane Smith
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#222",
+            "fontSize": 13.5,
+            "marginBottom": 1.8,
+            "textAlign": "left",
+          }
+        }
+      >
+        10 years experience
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#222",
+            "fontSize": 12.6,
+            "fontWeight": "500",
+            "marginBottom": 10.8,
+            "textAlign": "left",
+          }
+        }
+      >
+        $100/session
+      </Text>
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "alignSelf": "flex-start",
+            "borderColor": "#6C5CE7",
+            "borderRadius": 9,
+            "borderWidth": 1,
+            "opacity": 1,
+            "paddingHorizontal": 18,
+            "paddingVertical": 5.4,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#6C5CE7",
+              "fontSize": 14.4,
+              "fontWeight": "500",
+            }
+          }
+        >
+          View Profile
+        </Text>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "backgroundColor": "#fff",
+        "borderBottomLeftRadius": 18,
+        "borderBottomRightRadius": 18,
+        "opacity": 0.85,
+        "padding": 14.4,
+        "paddingBottom": 18,
+        "paddingTop": 9,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#222",
+          "fontSize": 14.4,
+          "fontWeight": "600",
+          "marginBottom": 1.8,
+        }
+      }
+    >
+      Cognitive Behavioral Therapy
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#888",
+          "fontSize": 11.7,
+          "marginBottom": 16.2,
+        }
+      }
+    >
+      Specialized in anxiety and depression treatment
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#888",
+          "fontSize": 10.8,
+          "marginBottom": 1.8,
+        }
+      }
+    >
+      Available online via:
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#222",
+          "fontSize": 13.5,
+          "fontWeight": "600",
+        }
+      }
+    >
+      Video, Audio, Chat
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "backgroundColor": "#E5E5EA",
+        "borderRadius": 3.6,
+        "height": 7.2,
+        "marginBottom": 0,
+        "overflow": "hidden",
+        "width": "100%",
+      }
+    }
+  >
+    <View
+      style={
+        [
+          {
+            "backgroundColor": "#6C5CE7",
+            "borderRadius": 3.6,
+            "height": "100%",
+          },
+          {
+            "width": "46%",
+          },
+        ]
+      }
+    />
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "flexDirection": "row",
+        "justifyContent": "center",
+        "paddingVertical": 9,
+      }
+    }
+  >
+    <View
+      style={
+        [
+          {
+            "backgroundColor": "#fff",
+            "borderRadius": 3.6,
+            "height": 7.2,
+            "marginHorizontal": 3.6,
+            "width": 7.2,
+          },
+          false,
+        ]
+      }
+    />
+    <View
+      style={
+        [
+          {
+            "backgroundColor": "#fff",
+            "borderRadius": 3.6,
+            "height": 7.2,
+            "marginHorizontal": 3.6,
+            "width": 7.2,
+          },
+          {
+            "backgroundColor": "#6C5CE7",
+          },
+        ]
+      }
+    />
+    <View
+      style={
+        [
+          {
+            "backgroundColor": "#fff",
+            "borderRadius": 3.6,
+            "height": 7.2,
+            "marginHorizontal": 3.6,
+            "width": 7.2,
+          },
+          false,
+        ]
+      }
+    />
+  </View>
+</View>
+`;

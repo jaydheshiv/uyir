@@ -16,15 +16,15 @@ export default function ProgressBar({ progress }: ProgressBarProps) {
 const styles = StyleSheet.create({
   progressBarBackground: {
     width: '100%',
-    height: 8,
+    height: 7.2,
     backgroundColor: '#E5E5EA',
-    borderRadius: 4,
+    borderRadius: 3.6,
     overflow: 'hidden',
     marginBottom: 0,
   },
   progressBarFill: {
     height: '100%',
     backgroundColor: '#6C5CE7',
-    borderRadius: 4,
+    borderRadius: 3.6,
   },
 });

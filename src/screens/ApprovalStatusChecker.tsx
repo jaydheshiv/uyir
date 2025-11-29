@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    marginTop: 16,
+    marginTop: 14.4,
   },
   errorContainer: {
     flex: 1,
@@ -134,16 +134,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   notApprovedText: {
-    marginBottom: 24,
+    marginBottom: 21.6,
   },
   checkAgainButton: {
-    width: 200,
-    marginBottom: 12,
+    width: 180,
+    marginBottom: 10.8,
   },
   attemptsText: {
     color: '#898A8D',
-    fontSize: 12,
+    fontSize: 10.8,
   },
 });
 
 export default ApprovalStatusChecker;
+

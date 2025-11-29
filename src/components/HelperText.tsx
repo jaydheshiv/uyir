@@ -11,7 +11,7 @@ const HelperText: React.FC<HelperTextProps> = ({ message, error }) => (
 );
 
 const styles = StyleSheet.create({
-  text: { fontSize: 12, color: '#888', marginTop: 4 },
+  text: { fontSize: 10.8, color: '#888', marginTop: 3.6 },
   error: { color: '#FF3B30' },
 });
 

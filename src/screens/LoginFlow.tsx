@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -17,7 +17,7 @@ type RootStackParamList = {
 
 const LoginFlow: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const [email, setEmail] = useState('jv@gmail.co');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mobile, setMobile] = useState('');
   const [loading, setLoading] = useState(false);
@@ -26,44 +26,137 @@ const LoginFlow: React.FC = () => {
 
   const handleContinue = async () => {
     setLoading(true);
-    try {
-      let body: any = {};
-      if (email) body.email = email;
-      if (mobile) body.mobile = mobile.startsWith('+91') ? mobile : `+91${mobile}`;
-      if (password) body.password = password;
-      if (!email && !mobile) {
-        Alert.alert('Validation', 'Please enter email or mobile number.');
-        setLoading(false);
-        return;
-      }
-      // Call FastAPI login endpoint (assume /auth/login returns OTP code)
-      const response = await fetch('http://10.0.2.2:8000/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        // Navigate to OTPVerificationScreenlogin with code and email/mobile
-        navigation.navigate('OTPVerificationScreenlogin', {
-          code: data.otp,
-          email: email || undefined,
-          mobile: mobile ? (mobile.startsWith('+91') ? mobile : `+91${mobile}`) : undefined,
-        });
-      } else {
-        Alert.alert('Error', typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail));
-      }
-    } catch (err) {
-      Alert.alert('Network error', 'Please try again later.');
-    } finally {
+
+    // Validate that at least email OR mobile is provided
+    const trimmedEmail = email.trim();
+    const trimmedMobile = mobile.trim();
+
+    if (!trimmedEmail && !trimmedMobile) {
+      Alert.alert(
+        'Login Required',
+        'Please enter either your email address or mobile number to login.'
+      );
       setLoading(false);
+      return;
     }
+
+    let retries = 3;
+    let lastError = null;
+
+    while (retries > 0) {
+      try {
+        // Backend /auth/login endpoint accepts either email or mobile
+        const body: any = {};
+
+        if (trimmedEmail) {
+          body.email = trimmedEmail;
+        }
+
+        if (trimmedMobile) {
+          // Ensure mobile has +91 prefix
+          body.mobile = trimmedMobile.startsWith('+91') ? trimmedMobile : `+91${trimmedMobile}`;
+        }
+
+        // Call FastAPI login endpoint
+        const backendUrl = 'http://dev.api.uyir.ai:8081/auth/login';
+
+        console.log('🔐 Calling login endpoint:', backendUrl);
+        console.log('📧 Login body:', JSON.stringify(body, null, 2));
+
+        // Add timeout to fetch request
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+        let response;
+        try {
+          response = await fetch(backendUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+            signal: controller.signal,
+          });
+          clearTimeout(timeoutId);
+          console.log('✅ Got response, status:', response.status);
+        } catch (fetchError) {
+          clearTimeout(timeoutId);
+          console.error('❌ Fetch failed:', fetchError);
+          throw fetchError;
+        }
+
+        const data = await response.json();
+        console.log('📨 Login response:', data);
+
+        if (response.ok) {
+          console.log('✅ Login successful, navigating to OTP verification');
+          // Navigate to OTPVerificationScreenlogin with code and email/mobile
+          navigation.navigate('OTPVerificationScreenlogin', {
+            code: data.otp,
+            email: trimmedEmail || undefined,
+            mobile: trimmedMobile ? (trimmedMobile.startsWith('+91') ? trimmedMobile : `+91${trimmedMobile}`) : undefined,
+          });
+          setLoading(false);
+          return;
+        } else {
+          console.error('❌ Login failed:', data);
+
+          // Handle specific error cases
+          if (typeof data.detail === 'string' && data.detail.includes('not verified')) {
+            Alert.alert(
+              'Account Not Verified',
+              'Your account exists but needs verification. The backend needs to be updated to resend OTP for unverified accounts. Please contact support or ask the backend team to add this feature.',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Contact Support',
+                  onPress: () => {
+                    Alert.alert(
+                      'Workaround',
+                      'Ask your backend team to:\n\n1. Either manually verify your account in the database, OR\n2. Update /auth/login to send OTP to unverified accounts, OR\n3. Add a "resend verification" endpoint'
+                    );
+                  }
+                }
+              ]
+            );
+          } else {
+            Alert.alert('Error', typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail));
+          }
+
+          setLoading(false);
+          return;
+        }
+      } catch (err: any) {
+        lastError = err;
+        console.error('❌ Network error during login:', (err instanceof Error ? err.message : String(err)));
+        console.error('❌ Error name:', err?.name);
+        console.error('❌ Full error:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
+
+        // Check if it's a timeout error
+        if (err?.name === 'AbortError') {
+          console.error('❌ Request timed out after 10 seconds');
+          Alert.alert(
+            'Connection Timeout',
+            'The server is taking too long to respond. Please check:\n\n1. Backend server is running\n2. URL is correct: http://dev.api.uyir.ai:8081\n3. Your network connection'
+          );
+          setLoading(false);
+          return;
+        }
+
+        retries -= 1;
+        if (retries === 0) {
+          Alert.alert(
+            'Network error',
+            `Could not connect to server. Please try again later.\n\nError: ${err?.message || 'Unknown error'}`
+          );
+        } else {
+          console.log(`🔄 Retrying login... (${3 - retries} attempt(s) left)`);
+        }
+      }
+    }
+    setLoading(false);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* ...removed status bar... */}
-
       {/* Back button and Login header */}
       <View style={styles.headerRow}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -74,11 +167,8 @@ const LoginFlow: React.FC = () => {
         </View>
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContentContainer}
-        keyboardShouldPersistTaps="handled"
-      >
-        <Text style={styles.headerTitle}>Create an Uyir account</Text>
+      <View style={styles.contentContainer}>
+        <Text style={styles.headerTitle}>Login to your Uyir account</Text>
 
         {/* Email */}
         <LabeledInput
@@ -164,59 +254,64 @@ const LoginFlow: React.FC = () => {
           <FontAwesome name="apple" size={22} color="#8170FF" style={styles.socialIcon} />
           <Text style={styles.socialButtonText}>Continue with Apple</Text>
         </TouchableOpacity>
-
-        {/* ...removed home indicator... */}
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
-  headerTitle: { fontSize: 18, fontWeight: '700', color: '#000', textAlign: 'left', marginBottom: 24 },
-  label: { fontSize: 16, color: '#000', marginBottom: 8, marginTop: 1 },
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 21.6,
+    paddingTop: 7.2,
+    paddingBottom: 40,
+  },
+  headerTitle: { fontSize: 14.4, fontWeight: '700', color: '#000', textAlign: 'left', marginBottom: 14.4 },
+  label: { fontSize: 12.6, color: '#000', marginBottom: 5.4, marginTop: 0.9 },
   input: {
-    height: 48,
+    height: 43.2,
     borderWidth: 1,
     borderColor: '#D6D6D6',
-    borderRadius: 12,
-    paddingHorizontal: 12,
+    borderRadius: 10.8,
+    paddingHorizontal: 10.8,
     backgroundColor: '#fff',
-    fontSize: 16,
-    marginBottom: 8,
+    fontSize: 12.6,
+    marginBottom: 7.2,
   },
   loginButton: {
     width: '100%',
-    height: 48,
+    height: 45,
     backgroundColor: '#8170FF',
-    borderRadius: 24,
+    borderRadius: 21.6,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 32,
+    marginTop: 14.4,
   },
-  loginButtonText: { color: '#fff', fontSize: 16, fontWeight: '500' },
+  loginButtonText: { color: '#fff', fontSize: 12.6, fontWeight: '500' },
   socialButton: {
     width: '100%',
-    height: 48,
-    borderRadius: 24,
+    height: 45,
+    borderRadius: 21.6,
     borderWidth: 1,
     borderColor: '#8170FF',
     backgroundColor: '#fff',
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 16,
-    paddingHorizontal: 80,
+    justifyContent: 'center',
+    marginTop: 12,
+    paddingHorizontal: 18,
   },
   socialIcon: {
-    fontSize: 20,
+    fontSize: 16.2,
     color: '#8170FF',
-    marginRight: 12,
-    width: 24,
+    marginRight: 7.2,
+    width: 18,
     textAlign: 'center',
   },
   socialButtonText: {
     color: '#8170FF',
-    fontSize: 16,
+    fontSize: 12.6,
     fontWeight: '500',
   },
   // New styles for inline style cleanup
@@ -224,9 +319,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingHorizontal: 20,
-    marginTop: 20,
-    marginBottom: 5,
+    paddingHorizontal: 18,
+    marginTop: 27,
+    marginBottom: 18,
   },
   headerTitleContainer: {
     flex: 1,
@@ -236,135 +331,128 @@ const styles = StyleSheet.create({
     right: 0,
   },
   headerTitleText: {
-    fontSize: 18,
+    fontSize: 16.2,
     fontWeight: '400',
     color: '#000',
     textAlign: 'center',
   },
-  scrollContentContainer: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 18,
-    paddingBottom: 16,
-    justifyContent: 'flex-start',
-  },
   marginBottom8: {
-    marginBottom: 8,
+    marginBottom: 7.2,
   },
   inputContainer: {
     position: 'relative',
-    marginBottom: 16,
+    marginBottom: 14.4,
   },
   passwordInputStyle: {
-    paddingRight: 40,
+    paddingRight: 36,
     marginBottom: 0,
   },
   eyeButton: {
     position: 'absolute',
-    right: 12,
-    top: 38,
-    height: 32,
-    width: 32,
+    right: 10.8,
+    top: 34.2,
+    height: 28.8,
+    width: 28.8,
     justifyContent: 'center',
     alignItems: 'center',
   },
   forgotPasswordContainer: {
     alignSelf: 'flex-end',
-    marginTop: -25,
-    marginBottom: 40,
+    marginTop: -12,
+    marginBottom: 14.4,
     paddingVertical: 0,
-    paddingHorizontal: 4,
+    paddingHorizontal: 3.6,
   },
   forgotPasswordText: {
     color: '#6C5CE7',
-    fontSize: 14,
+    fontSize: 11.7,
   },
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 24,
+    marginVertical: 10.8,
   },
   dividerLine: {
     flex: 1,
-    height: 1,
-    backgroundColor: '#000',
+    height: 0.9,
+    backgroundColor: '#D6D6D6',
   },
   dividerText: {
-    marginHorizontal: 12,
-    color: '#000',
-    fontSize: 16,
+    marginHorizontal: 9,
+    color: '#A8A8A8',
+    fontSize: 12.6,
   },
   socialLoginContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    marginBottom: 8,
+    marginBottom: 7.2,
   },
   indiaFlagButton: {
-    width: 48,
-    height: 48,
+    width: 43.2,
+    height: 43.2,
     borderWidth: 1,
     borderColor: '#000',
-    borderRadius: 12,
+    borderRadius: 10.8,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 8,
+    marginRight: 7.2,
     backgroundColor: '#fff',
   },
   flagContainer: {
-    width: 24,
-    height: 17,
-    borderRadius: 3,
+    width: 21.6,
+    height: 15.3,
+    borderRadius: 2.7,
     overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
   },
   flagStripeOrange: {
-    width: 24,
-    height: 5,
+    width: 21.6,
+    height: 4.5,
     backgroundColor: '#FF9933',
   },
   flagStripeWhite: {
-    width: 24,
-    height: 5,
+    width: 21.6,
+    height: 4.5,
     backgroundColor: '#fff',
   },
   flagStripeGreen: {
-    width: 24,
-    height: 5,
+    width: 21.6,
+    height: 4.5,
     backgroundColor: '#128807',
   },
   flagWheel: {
     position: 'absolute',
-    top: 6,
-    left: 10,
-    width: 4,
-    height: 4,
-    borderRadius: 2,
+    top: 5.4,
+    left: 9,
+    width: 3.6,
+    height: 3.6,
+    borderRadius: 1.8,
     backgroundColor: '#000088',
   },
   continueWithText: {
-    fontSize: 16,
+    fontSize: 12.6,
     color: '#A8A8A8',
-    marginRight: 4,
+    marginRight: 3.6,
     alignSelf: 'flex-end',
-    paddingBottom: 12,
+    paddingBottom: 10.8,
   },
   flexOne: {
     flex: 1,
     marginBottom: 0,
   },
   buttonHeight48: {
-    height: 48,
+    height: 43.2,
     marginBottom: 0,
   },
   disclaimerText: {
     color: '#A8A8A8',
-    fontSize: 12,
-    marginTop: 4,
-    marginBottom: 8,
+    fontSize: 9.9,
+    marginTop: 1.8,
+    marginBottom: 3.6,
   },
   marginTop16: {
-    marginTop: 16,
+    marginTop: 50,
   },
   opacity06: {
     opacity: 0.6,
@@ -372,3 +460,4 @@ const styles = StyleSheet.create({
 });
 
 export default LoginFlow;
+

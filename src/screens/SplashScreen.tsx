@@ -36,9 +36,10 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	logo: {
-		width: 250,
-		height: 80,
+		width: 225,
+		height: 72,
 	},
 });
 
 export default SplashScreen;
+

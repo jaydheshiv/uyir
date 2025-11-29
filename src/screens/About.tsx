@@ -34,32 +34,33 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 	},
 	container: {
-		padding: 24,
+		padding: 21.6,
 		backgroundColor: '#fff',
 		flexGrow: 1,
 	},
 	backBtn: {
-		marginBottom: 3,
-		marginTop: 30,
+		marginBottom: 2.7,
+		marginTop: 27,
 		alignSelf: 'flex-start',
 	},
 	title: {
-		fontSize: 28,
+		fontSize: 25.2,
 		fontWeight: 'bold',
 		color: '#222',
-		marginBottom: 24,
-		marginTop: 16,
+		marginBottom: 21.6,
+		marginTop: 14.4,
 		fontFamily: 'Outfit-Bold',
 	},
 	aboutText: {
-		fontSize: 14.5,
-		lineHeight: 26,
+		fontSize: 13.1,
+		lineHeight: 23.4,
 		color: '#0A0A0A',
-		marginBottom: 32,
+		marginBottom: 28.8,
 	},
 	bottomNavWrapper: {
-		marginBottom: 25,
+		marginBottom: 22.5,
 	},
 });
 
 export default About;
+

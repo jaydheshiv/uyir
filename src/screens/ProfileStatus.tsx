@@ -98,40 +98,40 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   header: {
-    paddingHorizontal: 20, // reduced
-    paddingTop: 70, // reduced
+    paddingHorizontal: 18, // reduced
+    paddingTop: 63, // reduced
     paddingBottom: 0,
   },
   headerTitle: {
-    fontSize: 25, // reduced
+    fontSize: 22.5, // reduced
     fontWeight: 'bold',
     color: '#000000',
-    marginBottom: 10, // reduced
+    marginBottom: 9, // reduced
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20, // reduced
-    paddingTop: 20, // reduced
+    paddingHorizontal: 18, // reduced
+    paddingTop: 18, // reduced
   },
   optionContainer: {
     borderWidth: 1,
     borderColor: '#222',
-    borderRadius: 12, // reduced
-    padding: 12, // reduced
+    borderRadius: 10.8, // reduced
+    padding: 10.8, // reduced
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 20, // reduced
+    marginBottom: 18, // reduced
     backgroundColor: '#fff',
   },
   optionText: {
-    fontSize: 15, // reduced
+    fontSize: 13.5, // reduced
     color: '#000000',
   },
   radioOuter: {
-    width: 22, // reduced
-    height: 22, // reduced
-    borderRadius: 11, // reduced
+    width: 19.8, // reduced
+    height: 19.8, // reduced
+    borderRadius: 9.9, // reduced
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
@@ -143,30 +143,30 @@ const styles = StyleSheet.create({
     borderColor: '#D1D5DB',
   },
   radioInner: {
-    width: 10, // reduced
-    height: 10, // reduced
-    borderRadius: 5, // reduced
+    width: 9, // reduced
+    height: 9, // reduced
+    borderRadius: 4.5, // reduced
     backgroundColor: '#7B61FF',
   },
   saveButtonContainer: {
-    paddingHorizontal: 20, // reduced
-    marginBottom: 30, // reduced
+    paddingHorizontal: 18, // reduced
+    marginBottom: 27, // reduced
   },
   saveButton: {
     width: '100%',
     backgroundColor: '#7B61FF',
-    paddingVertical: 12, // reduced
-    borderRadius: 20, // reduced
+    paddingVertical: 10.8, // reduced
+    borderRadius: 18, // reduced
     alignItems: 'center',
     justifyContent: 'center',
   },
   saveButtonText: {
     color: '#FFFFFF',
-    fontSize: 16, // reduced
+    fontSize: 14.4, // reduced
     fontWeight: '600',
   },
   backButtonMargin: {
-    marginBottom: 20,
+    marginBottom: 18,
   },
 });
 

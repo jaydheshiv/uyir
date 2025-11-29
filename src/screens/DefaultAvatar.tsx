@@ -54,39 +54,39 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 110,
+    paddingHorizontal: 21.6,
+    paddingTop: 99,
     paddingBottom: 0,
     justifyContent: 'flex-start',
   },
   title: {
-    fontSize: 24,
+    fontSize: 21.6,
     fontWeight: '700',
     color: '#000',
-    marginBottom: 8,
+    marginBottom: 7.2,
     fontFamily: Platform.OS === 'ios' ? 'Outfit' : undefined,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14.4,
     color: '#000',
-    marginBottom: 32,
+    marginBottom: 28.8,
     fontFamily: Platform.OS === 'ios' ? 'Outfit' : undefined,
   },
   avatarRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 32,
-    gap: 24,
+    marginBottom: 28.8,
+    gap: 21.6,
   },
   avatarButton: {
-    width: 160,
-    height: 160,
-    borderRadius: 80,
+    width: 144,
+    height: 144,
+    borderRadius: 72,
     borderWidth: 4,
     borderColor: '#E0E0E0',
     overflow: 'hidden',
-    marginHorizontal: 8,
+    marginHorizontal: 7.2,
     backgroundColor: '#F5F5F5',
   },
   avatarSelected: {
@@ -95,16 +95,17 @@ const styles = StyleSheet.create({
   avatarImage: {
     width: '100%',
     height: '100%',
-    borderRadius: 80,
+    borderRadius: 72,
   },
   bottomSection: {
-    paddingHorizontal: 24,
-    paddingBottom: 24,
+    paddingHorizontal: 21.6,
+    paddingBottom: 21.6,
     backgroundColor: '#fff',
   },
   nextButtonSpacing: {
-    marginBottom: 16,
+    marginBottom: 14.4,
   },
 });
 
 export default DefaultAvatar;
+

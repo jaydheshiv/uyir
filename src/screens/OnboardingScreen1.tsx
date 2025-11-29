@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignSelf: 'center',
         width: '100%',
-        maxWidth: 393,
+        maxWidth: 353.7,
     },
     logoContainer: {
         flex: 1,
@@ -62,33 +62,33 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     logo: {
-        width: 224,
-        height: 76,
+        width: 300,
+        height: 70,
     },
     content: {
         justifyContent: 'flex-end',
         alignItems: 'center',
-        paddingHorizontal: 24,
-        paddingBottom: 48,
+        paddingHorizontal: 21.6,
+        paddingBottom: 43.2,
     },
     buttonContainer: {
         width: '100%',
-        maxWidth: 345,
+        maxWidth: 310.5,
         marginBottom: 0,
     },
     guestButton: {
-        marginTop: 32,
-        marginBottom: 32,
+        marginTop: 28.8,
+        marginBottom: 28.8,
         backgroundColor: 'transparent',
     },
     guestButtonText: {
         color: '#8170FF',
-        fontSize: 16,
+        fontSize: 14.4,
         fontWeight: '500',
         textDecorationLine: 'underline',
     },
     loginButtonSpacing: {
-        marginBottom: 16,
+        marginBottom: 14.4,
     },
     signupButtonSpacing: {
         marginBottom: 0,
@@ -96,3 +96,4 @@ const styles = StyleSheet.create({
 });
 
 export default OnboardingScreen1;
+

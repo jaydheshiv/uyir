@@ -80,46 +80,46 @@ const RadioButton: React.FC<{ isSelected: boolean }> = ({ isSelected }) => (
 
 const styles = StyleSheet.create({
 	container: {
-		padding: 24,
+		padding: 21.6,
 		backgroundColor: '#fff',
 		flexGrow: 1,
 	},
 	backBtn: {
-		marginBottom: 12,
-		marginTop: 30,
+		marginBottom: 10.8,
+		marginTop: 27,
 		alignSelf: 'flex-start',
 	},
 	title: {
-		fontSize: 28,
+		fontSize: 25.2,
 		fontWeight: 'bold',
 		color: '#222',
-		marginBottom: 24,
-		marginTop: 16,
+		marginBottom: 21.6,
+		marginTop: 14.4,
 		fontFamily: 'Outfit-Bold',
 	},
 	sectionTitle: {
-		fontSize: 20,
+		fontSize: 18,
 		fontWeight: 'bold',
 		color: '#0A0A0A',
-		marginBottom: 16,
+		marginBottom: 14.4,
 	},
 	languageOption: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		paddingVertical: 16,
+		paddingVertical: 14.4,
 		borderBottomWidth: 1,
 		borderBottomColor: '#F2F2F7',
 	},
 	languageText: {
-		fontSize: 18,
+		fontSize: 16.2,
 		fontWeight: '400',
 		color: '#0A0A0A',
 	},
 	radioBase: {
-		width: 24,
-		height: 24,
-		borderRadius: 12,
+		width: 21.6,
+		height: 21.6,
+		borderRadius: 10.8,
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderWidth: 2,
@@ -135,9 +135,9 @@ const styles = StyleSheet.create({
 		backgroundColor: '#F6F7FF',
 	},
 	radioDot: {
-		width: 12,
-		height: 12,
-		borderRadius: 6,
+		width: 10.8,
+		height: 10.8,
+		borderRadius: 5.4,
 		backgroundColor: '#7B66FF',
 	},
 	safeAreaContainer: {
@@ -145,11 +145,12 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 	},
 	sectionSpacing: {
-		marginBottom: 32,
+		marginBottom: 28.8,
 	},
 	bottomNavContainer: {
-		marginBottom: 25,
+		marginBottom: 31.5,
 	},
 });
 
 export default Language;
+

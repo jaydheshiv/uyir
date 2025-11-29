@@ -1,15 +1,17 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
-  Dimensions,
   ImageBackground,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { wp } from '../utils/responsive';
 
 const allFeatures = [
   { name: 'Twin Creation', includedLite: true, includedPlus: true },
@@ -42,7 +44,7 @@ const ProLite: React.FC = () => {
   const price = selectedPlan === 'lite' ? '₹199/month' : '₹499/month';
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <ImageBackground
         source={{
           uri: 'https://api.builder.io/api/v1/image/assets/TEMP/c45d4d93ad09a27f2183cc6acc6bc43c8e12b265?width=786',
@@ -51,10 +53,13 @@ const ProLite: React.FC = () => {
         imageStyle={styles.backgroundImageOpacity}
         resizeMode="cover"
       >
-        <View style={styles.contentScale}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Back Button */}
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={28} color="#fff" />
+            <Ionicons name="arrow-back" size={wp(7)} color="#fff" />
           </TouchableOpacity>
 
           {/* Plan Toggle */}
@@ -170,9 +175,9 @@ const ProLite: React.FC = () => {
               Subscribe Now
             </Text>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
       </ImageBackground>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -180,43 +185,40 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#1a1440' },
   bgImage: { flex: 1, width: '100%', height: '100%' },
   scrollContent: {
-    paddingTop: Platform.OS === 'ios' ? 36 : 24,
-    paddingBottom: 32,
-    paddingHorizontal: 16,
-    minHeight: Dimensions.get('window').height,
-  },
-  contentScale: {
-    transform: [{ scale: 0.9 }],
+    paddingTop: 14.4,
+    paddingBottom: 28.8,
+    paddingHorizontal: 18,
+    flexGrow: 1,
   },
 
   backButton: {
-    marginBottom: 18,
-    marginTop: 25,
+    marginBottom: 14.4,
+    marginTop: 7.2,
     alignSelf: 'flex-start',
     backgroundColor: 'rgba(44,44,44,0.2)',
-    borderRadius: 20,
-    padding: 1,
+    borderRadius: 18,
+    padding: 3.6,
   },
   toggleRow: {
     flexDirection: 'row',
-    marginBottom: 40,
-    marginTop: 20,
-    gap: 6,
+    marginBottom: 25.2,
+    marginTop: 12.6,
+    gap: 7.2,
     justifyContent: 'center',
   },
   toggleButton: {
-    flex: 2,
-    paddingVertical: 12,
-    borderRadius: 30,
+    flex: 1,
+    paddingVertical: 9,
+    borderRadius: 25.2,
     backgroundColor: '#E6E6E6',
     alignItems: 'center',
-    marginHorizontal: 1,
+    marginHorizontal: 3.6,
   },
   toggleButtonActive: {
     backgroundColor: '#E1DBFF',
   },
   toggleButtonText: {
-    fontSize: 18,
+    fontSize: 12.6,
     color: '#222',
     fontWeight: '700',
   },
@@ -230,21 +232,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   featuresList: {
-    marginBottom: 50,
-    marginTop: 10,
+    marginBottom: 28.8,
+    marginTop: 7.2,
   },
   featureRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24, // Increased space between lines
+    marginBottom: 16.2,
   },
   featureIcon: {
-    width: 30,
-    height: 30,
-    borderRadius: 18,
+    width: 25.2,
+    height: 25.2,
+    borderRadius: 12.6,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 9,
   },
   featureIconIncluded: {
     backgroundColor: '#fff',
@@ -253,8 +255,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#B3B3B3',
   },
   featureText: {
-    fontSize: 23,
+    fontSize: 14.4,
     fontWeight: 'bold',
+    flex: 1,
     fontFamily: Platform.OS === 'ios' ? 'Outfit-Bold' : undefined,
   },
   featureTextIncluded: {
@@ -266,18 +269,18 @@ const styles = StyleSheet.create({
   },
   subDescription: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 11.7,
     opacity: 0.9,
-    marginBottom: 100,
-    marginTop: -50,
+    marginBottom: 45,
+    marginTop: -32,
     fontWeight: '400',
   },
   pricingCard: {
     backgroundColor: '#fff',
-    borderRadius: 32,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    marginBottom: 18,
+    borderRadius: 25.2,
+    paddingVertical: 12.6,
+    paddingHorizontal: 16.2,
+    marginBottom: 14.4,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -293,41 +296,41 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   radioOuter: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 25.2,
+    height: 25.2,
+    borderRadius: 12.6,
     borderWidth: 2,
     borderColor: '#B3B3B3',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 9,
     backgroundColor: '#fff',
   },
   radioOuterActive: {
     borderColor: '#8170FF',
   },
   radioInnerActive: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 14.4,
+    height: 14.4,
+    borderRadius: 7.2,
     backgroundColor: '#8170FF',
   },
   pricingTypeText: {
-    fontSize: 20,
+    fontSize: 14.4,
     color: '#222',
     fontWeight: '400',
   },
   pricingAmount: {
-    fontSize: 22,
+    fontSize: 16.2,
     color: '#222',
     fontWeight: '700',
   },
   subscribeButton: {
     backgroundColor: '#E6E6E6',
-    borderRadius: 32,
-    paddingVertical: 16,
+    borderRadius: 25.2,
+    paddingVertical: 12.6,
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 14.4,
     marginTop: 0,
   },
   subscribeButtonActive: {
@@ -335,7 +338,7 @@ const styles = StyleSheet.create({
   },
   subscribeButtonText: {
     color: '#222',
-    fontSize: 20,
+    fontSize: 14.4,
     fontWeight: '700',
   },
   subscribeButtonTextActive: {

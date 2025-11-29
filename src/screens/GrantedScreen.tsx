@@ -4,10 +4,12 @@ import React, { useState } from 'react';
 import { Image, Platform, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import PrimaryButton from '../components/PrimaryButton';
+import { useAuth } from '../store/useAppStore';
 
 type RootStackParamList = {
   GrantedScreen: undefined;
   CreateAvatar1: undefined;
+  Avatarhome1: undefined;
   // add other routes here if needed
 };
 
@@ -16,11 +18,30 @@ const GrantedScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const [isLoading, setIsLoading] = useState(false);
 
+  // ✅ Get user status from Zustand
+  const { isNewUser, user } = useAuth();
+
   const handleContinue = () => {
     setIsLoading(true);
+
+    // ✅ Debug logging
+    const newUserStatus = isNewUser();
+    console.log('=== GRANTED SCREEN DEBUG ===');
+    console.log('isNewUser():', newUserStatus);
+    console.log('user:', JSON.stringify(user, null, 2));
+    console.log('===========================');
+
     setTimeout(() => {
       setIsLoading(false);
-      navigation.navigate('CreateAvatar1');
+
+      // ✅ Smart navigation based on user status
+      if (newUserStatus) {
+        console.log('🆕 New user from GrantedScreen - navigating to CreateAvatar1');
+        navigation.navigate('CreateAvatar1');
+      } else {
+        console.log('👤 Returning user from GrantedScreen - navigating to Avatarhome1');
+        navigation.navigate('Avatarhome1');
+      }
     }, 2000);
   };
 
@@ -56,7 +77,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: 24,
+    paddingHorizontal: 21.6,
     justifyContent: 'flex-end',
   },
   flexGrow: {
@@ -69,37 +90,37 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    marginTop: 40,
+    marginTop: 36,
   },
   illustration: {
-    width: 220,
-    height: 220,
+    width: 198,
+    height: 198,
   },
   bottomSection: {
     width: '100%',
     alignItems: 'center',
     justifyContent: 'flex-end',
     paddingBottom: 0,
-    marginBottom: 24,
+    marginBottom: 21.6,
   },
   messageText: {
     color: '#000',
-    fontSize: 18,
+    fontSize: 16.2,
     textAlign: 'center',
     fontFamily: Platform.OS === 'ios' ? 'Outfit' : undefined,
-    marginBottom: 24,
+    marginBottom: 21.6,
     marginTop: 0,
     width: '100%',
   },
   continueButton: {
     width: '100%',
-    maxWidth: 345,
+    maxWidth: 310.5,
     alignSelf: 'center',
-    marginBottom: 8,
-    height: 56,
+    marginBottom: 7.2,
+    height: 50.4,
   },
   continueButtonText: {
-    fontSize: 18,
+    fontSize: 16.2,
     fontWeight: '500',
   },
   bottomSpacer: {
@@ -108,3 +129,4 @@ const styles = StyleSheet.create({
 });
 
 export default GrantedScreen;
+

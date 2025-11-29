@@ -24,8 +24,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderColor: '#8170FF',
     borderWidth: 1.5,
-    borderRadius: 24,
-    height: 48,
+    borderRadius: 21.6,
+    height: 43.2,
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 0,
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#8170FF',
-    fontSize: 16,
+    fontSize: 14.4,
     fontWeight: '600',
   },
 });

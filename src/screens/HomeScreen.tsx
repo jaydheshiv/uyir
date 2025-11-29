@@ -8,14 +8,14 @@ const COLORS = {
 };
 
 const SPACING = {
-  lg: 24,
-  md: 16,
-  xl: 32,
+  lg: 21.6,
+  md: 14.4,
+  xl: 28.8,
 };
 
 const FONT_SIZES = {
-  xxl: 32,
-  md: 16,
+  xxl: 28.8,
+  md: 14.4,
 };
 
 // Simple Button component as a placeholder for '@components'
@@ -77,11 +77,11 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: '100%',
-    maxWidth: 200,
+    maxWidth: 180,
   },
   button: {
     padding: SPACING.md,
-    borderRadius: 8,
+    borderRadius: 7.2,
     alignItems: 'center',
   },
   buttonText: {
@@ -91,3 +91,4 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
+

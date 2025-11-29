@@ -72,18 +72,18 @@ const OTPInput: React.FC<OTPInputProps> = ({
 const styles = StyleSheet.create({
   row: { 
     flexDirection: 'row', 
-    gap: 20, // more space between boxes
-    marginBottom: 16,
+    gap: 18, // more space between boxes
+    marginBottom: 14.4,
     alignItems: 'flex-start',
     marginLeft: 0 // adjust as needed for your layout
   },
   input: {
-    width: 68, // bigger width
-    height: 68, // bigger height
+    width: 61.2, // bigger width
+    height: 61.2, // bigger height
     borderWidth: 2,
     borderColor: '#888',
-    borderRadius: 16,
-    fontSize: 32,
+    borderRadius: 14.4,
+    fontSize: 28.8,
     textAlign: 'center',
     backgroundColor: '#fff',
   },

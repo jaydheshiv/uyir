@@ -12,9 +12,9 @@ export default function ModalCard({ children, style, ...props }: ViewProps) {
 const styles = StyleSheet.create({
   modalContainer: {
     backgroundColor: '#F7F7F9',
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    paddingBottom: 24,
+    borderTopLeftRadius: 25.2,
+    borderTopRightRadius: 25.2,
+    paddingBottom: 21.6,
     paddingTop: 0,
     paddingHorizontal: 0,
     width: '100%',

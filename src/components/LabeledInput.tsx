@@ -15,17 +15,17 @@ const LabeledInput: React.FC<LabeledInputProps> = ({ label, containerStyle, inpu
 );
 
 const styles = StyleSheet.create({
-  container: { marginBottom: 24 },
-  label: { fontSize: 16, color: '#000', marginBottom: 8, fontWeight: '500' },
+  container: { marginBottom: 21.6 },
+  label: { fontSize: 14.4, color: '#000', marginBottom: 7.2, fontWeight: '500' },
   input: {
     width: '100%',
-    height: 48,
-    borderRadius: 12,
+    height: 43.2,
+    borderRadius: 10.8,
     borderWidth: 1,
     borderColor: '#D1D5DB',
     backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    fontSize: 16,
+    paddingHorizontal: 14.4,
+    fontSize: 14.4,
     color: '#000',
   },
 });

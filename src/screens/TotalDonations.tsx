@@ -66,24 +66,24 @@ const styles = StyleSheet.create({
   headerWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 60,
-    paddingHorizontal: 18,
-    paddingBottom: 18,
+    paddingTop: 54,
+    paddingHorizontal: 16.2,
+    paddingBottom: 16.2,
     backgroundColor: '#F7F7F7',
     justifyContent: 'space-between',
   },
   backBtn: {
-    padding: 4,
-    borderRadius: 20,
+    padding: 3.6,
+    borderRadius: 18,
     backgroundColor: 'rgba(255,255,255,0.7)',
   },
   editBtn: {
-    padding: 4,
-    borderRadius: 20,
+    padding: 3.6,
+    borderRadius: 18,
     backgroundColor: 'rgba(255,255,255,0.7)',
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 25.2,
     fontWeight: 'bold',
     color: '#222',
     flex: 1,
@@ -92,13 +92,13 @@ const styles = StyleSheet.create({
     // Remove negative margin to avoid overlap
   },
   tableWrapper: {
-    marginHorizontal: 18,
-    marginTop: 8,
+    marginHorizontal: 16.2,
+    marginTop: 7.2,
     backgroundColor: '#fff',
-    borderRadius: 24,
+    borderRadius: 21.6,
     borderWidth: 1.5,
     borderColor: '#D1C9F7',
-    paddingBottom: 8,
+    paddingBottom: 7.2,
     flex: 1,
     overflow: 'hidden',
   },
@@ -106,12 +106,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5E5',
-    paddingVertical: 16,
-    paddingHorizontal: 18,
+    paddingVertical: 14.4,
+    paddingHorizontal: 16.2,
     backgroundColor: '#fff',
   },
   tableHeaderCell: {
-    fontSize: 16,
+    fontSize: 14.4,
     fontWeight: 'bold',
     color: '#222',
     fontFamily: 'Outfit-Bold',
@@ -120,12 +120,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5E5',
-    paddingVertical: 14,
-    paddingHorizontal: 18,
+    paddingVertical: 12.6,
+    paddingHorizontal: 16.2,
     backgroundColor: '#fff',
   },
   tableCell: {
-    fontSize: 16,
+    fontSize: 14.4,
     color: '#222',
     fontFamily: 'Outfit-Regular',
   },
@@ -142,8 +142,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bottomNavContainer: {
-    marginBottom: 25,
+    marginBottom: 31.5,
   },
 });
 
 export default TotalDonations;
+

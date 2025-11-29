@@ -1,22 +1,104 @@
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Edit } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CustomBottomNav from '../components/CustomBottomNav';
+import { useAuth } from '../store/useAppStore';
 
-const initialCards = [
-  { title: 'Share it in my public view', active: true },
-  { title: 'For subscribers only', active: false },
-  { title: 'Keep it private', active: false },
+interface VisibilityOption {
+  title: string;
+  value: 'public' | 'subscribers' | 'private';
+  active: boolean;
+}
+
+const visibilityOptions: VisibilityOption[] = [
+  { title: 'Share it in my public view', value: 'public', active: true },
+  { title: 'For subscribers only', value: 'subscribers', active: false },
+  { title: 'Keep it private', value: 'private', active: false },
 ];
 
 const CvKnowledgeBase1: React.FC = () => {
   const navigation = useNavigation();
-  const [cards, setCards] = useState(initialCards);
+  const route = useRoute();
+  const { token } = useAuth();
+
+  const selectedFiles = (route.params as any)?.selectedFiles || [];
+  const [visibilityCards, setVisibilityCards] = useState(visibilityOptions);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleToggle = (idx: number) => {
-    setCards(cards.map((card, i) => i === idx ? { ...card, active: !card.active } : card));
+    setVisibilityCards(visibilityCards.map((card, i) => ({
+      ...card,
+      active: i === idx, // Only one can be active
+    })));
+  };
+
+  const handleSave = async () => {
+    const selectedVisibility = visibilityCards.find(card => card.active);
+    if (!selectedVisibility) {
+      Alert.alert('Error', 'Please select a visibility option');
+      return;
+    }
+
+    if (selectedFiles.length === 0) {
+      Alert.alert('Error', 'No files selected to update visibility');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      console.log('📡 Updating visibility for', selectedFiles.length, 'files');
+      console.log('Visibility:', selectedVisibility.value);
+
+      // Update visibility for each selected file
+      const apiBaseUrl = 'http://dev.api.uyir.ai:8081';
+      const updatePromises = selectedFiles.map(async (file: any) => {
+        const response = await fetch(
+          `${apiBaseUrl}/professional/kb/${file.id}`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              visibility: selectedVisibility.value,
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`❌ Failed to update ${file.title}:`, response.status, errorText);
+          throw new Error(`Failed to update ${file.title}`);
+        }
+
+        console.log(`✅ Updated ${file.title} to ${selectedVisibility.value}`);
+        return response.json();
+      });
+
+      await Promise.all(updatePromises);
+
+      Alert.alert(
+        'Success!',
+        `Visibility updated to "${selectedVisibility.title}" for ${selectedFiles.length} file(s).`,
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              // Navigate back to content visibility or knowledge base
+              navigation.navigate('ContentVisibility' as never);
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      console.error('❌ Error updating visibility:', error);
+      Alert.alert('Error', 'Failed to update visibility. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -34,8 +116,11 @@ const CvKnowledgeBase1: React.FC = () => {
       <View style={styles.scrollContent}>
         <Text style={styles.sectionTitle}>Knowledge Base</Text>
         <Text style={styles.sectionDesc}>Select which memory capsules are visible on your public profile.</Text>
+        <Text style={styles.selectedCount}>
+          {selectedFiles.length} file(s) selected
+        </Text>
         <FlatList
-          data={cards}
+          data={visibilityCards}
           keyExtractor={(_, idx) => idx.toString()}
           style={styles.flatListMaxHeight}
           showsVerticalScrollIndicator={true}
@@ -46,8 +131,16 @@ const CvKnowledgeBase1: React.FC = () => {
             </TouchableOpacity>
           )}
         />
-        <TouchableOpacity style={styles.saveButton}>
-          <Text style={styles.saveButtonText}>Save</Text>
+        <TouchableOpacity
+          style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
+          onPress={handleSave}
+          disabled={isSaving}
+        >
+          {isSaving ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.saveButtonText}>Save</Text>
+          )}
         </TouchableOpacity>
       </View>
       <View style={styles.bottomNavWrapper}>
@@ -65,75 +158,77 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 60,
-    paddingHorizontal: 24,
+    paddingTop: 49.5,
+    paddingHorizontal: 18,
     paddingBottom: 0,
-    marginLeft: -80,
-    marginBottom: -30,
+    marginLeft: -60,
+    marginBottom: -24,
     backgroundColor: '#F7F7F7',
     justifyContent: 'space-between',
   },
   backBtn: {
-    padding: 1,
-    borderRadius: 20,
-    marginBottom: 80,
-    marginLeft: 70,
+    padding: 0.9,
+    borderRadius: 16.2,
+    marginBottom: 57.6,
+    marginLeft: 50.4,
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 21.6,
     fontWeight: 'bold',
     color: '#222',
     flex: 1,
     textAlign: 'left',
-    marginLeft: -30,
-    marginTop: 10,
+    marginLeft: -24,
+    marginTop: 7.2,
     fontFamily: 'Outfit',
   },
   editIcon: {
-    padding: 4,
-    borderRadius: 20,
-    marginBottom: 80,
-    marginLeft: 70,
+    padding: 0.9,
+    borderRadius: 16.2,
+    marginBottom: 57.6,
+    marginLeft: 50.4,
   },
   scrollContent: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 24,
-    gap: 12,
+    paddingHorizontal: 10.8,
+    paddingTop: 0,
+    paddingBottom: 7.2,
+    gap: 9,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 17.1,
     fontWeight: 'bold',
     color: '#222',
-    marginBottom: 0,
+    marginTop: 0,
     fontFamily: 'Outfit',
+    marginLeft: 4.5,
   },
   sectionDesc: {
-    fontSize: 16,
+    fontSize: 12.6,
     color: '#222',
-    marginBottom: 18,
+    marginBottom: 12.6,
     fontFamily: 'Outfit-Regular',
+    marginLeft: 4.5,
   },
 
   card: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: 16,
-    paddingVertical: 18,
-    paddingHorizontal: 18,
-    marginBottom: 12,
+    borderRadius: 12.6,
+    paddingVertical: 12.6,
+    paddingHorizontal: 12.6,
+    marginBottom: 9,
     borderWidth: 1.5,
     borderColor: '#D1C9F7',
     elevation: 0,
   },
   radioCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 19.8,
+    height: 19.8,
+    borderRadius: 9.9,
     borderWidth: 4,
     borderColor: '#8170FF',
-    marginRight: 16,
+    marginRight: 10.8,
     backgroundColor: '#F7F7F7',
   },
   radioInactive: {
@@ -141,43 +236,56 @@ const styles = StyleSheet.create({
     backgroundColor: '#F7F7FF',
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 14.4,
     fontWeight: 'bold',
     color: '#222',
     fontFamily: 'Outfit',
   },
   saveButton: {
     backgroundColor: '#8170FF',
-    borderRadius: 24,
-    paddingVertical: 16,
+    borderRadius: 18,
+    paddingVertical: 10.8,
     alignItems: 'center',
-    marginTop: 220,
-    marginBottom: 32,
+    marginTop: 250,
+    marginBottom: 23.4,
   },
   saveButtonText: {
     color: '#fff',
     fontWeight: '700',
-    fontSize: 18,
+    fontSize: 14.4,
     fontFamily: 'Outfit',
   },
   bottomNavWrapper: {
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: 0,
+    bottom: 13.5,
     backgroundColor: '#fff',
     paddingTop: 0,
-    paddingBottom: 20,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    paddingBottom: 14.4,
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
     elevation: 10,
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 8,
   },
   flatListMaxHeight: {
-    maxHeight: 420,
+    maxHeight: 324,
+  },
+  selectedCount: {
+    fontSize: 13.5,
+    color: '#8170FF',
+    fontWeight: '600',
+    marginBottom: 12,
+    marginLeft: 4.5,
+    fontFamily: 'Outfit',
+  },
+  saveButtonDisabled: {
+    backgroundColor: '#B0B0B0',
+    opacity: 0.7,
   },
 });
 
 export default CvKnowledgeBase1;
+

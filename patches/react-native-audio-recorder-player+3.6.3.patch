@@ -1,0 +1,57 @@
+diff --git a/node_modules/react-native-audio-recorder-player/android/src/main/java/com/dooboolab.audiorecorderplayer/RNAudioRecorderPlayerModule.kt b/node_modules/react-native-audio-recorder-player/android/src/main/java/com/dooboolab.audiorecorderplayer/RNAudioRecorderPlayerModule.kt
+index 31e07ee..ef3570e 100644
+--- a/node_modules/react-native-audio-recorder-player/android/src/main/java/com/dooboolab.audiorecorderplayer/RNAudioRecorderPlayerModule.kt
++++ b/node_modules/react-native-audio-recorder-player/android/src/main/java/com/dooboolab.audiorecorderplayer/RNAudioRecorderPlayerModule.kt
+@@ -1,6 +1,7 @@
+ package com.dooboolab.audiorecorderplayer
+ 
+ import android.Manifest
++import android.app.Activity
+ import android.content.pm.PackageManager
+ import android.media.MediaPlayer
+ import android.media.MediaRecorder
+@@ -30,6 +31,8 @@ class RNAudioRecorderPlayerModule(private val reactContext: ReactApplicationCont
+     private var pausedRecordTime = 0L
+     private var totalPausedRecordTime = 0L
+     var recordHandler: Handler? = Handler(Looper.getMainLooper())
++    private val hostActivity: Activity?
++        get() = reactContext.currentActivity
+     override fun getName(): String {
+         return tag
+     }
+@@ -44,13 +47,23 @@ class RNAudioRecorderPlayerModule(private val reactContext: ReactApplicationCont
+                 if (Build.VERSION.SDK_INT < 29 &&
+                         (ActivityCompat.checkSelfPermission(reactContext, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
+                         ActivityCompat.checkSelfPermission(reactContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED))  {
+-                    ActivityCompat.requestPermissions((currentActivity)!!, arrayOf(
++                    val activity = hostActivity
++                    if (activity == null) {
++                        promise.reject("No permission granted.", "Current activity is null")
++                        return
++                    }
++                    ActivityCompat.requestPermissions(activity, arrayOf(
+                             Manifest.permission.RECORD_AUDIO,
+                             Manifest.permission.WRITE_EXTERNAL_STORAGE), 0)
+                     promise.reject("No permission granted.", "Try again after adding permission.")
+                     return
+                 } else if (ActivityCompat.checkSelfPermission(reactContext, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+-                    ActivityCompat.requestPermissions((currentActivity)!!, arrayOf(Manifest.permission.RECORD_AUDIO), 0)
++                    val activity = hostActivity
++                    if (activity == null) {
++                        promise.reject("No permission granted.", "Current activity is null")
++                        return
++                    }
++                    ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.RECORD_AUDIO), 0)
+                     promise.reject("No permission granted.", "Try again after adding permission.")
+                     return
+                 }
+@@ -217,7 +230,8 @@ class RNAudioRecorderPlayerModule(private val reactContext: ReactApplicationCont
+                         val key = iterator.nextKey()
+                         headers.put(key, httpHeaders.getString(key))
+                     }
+-                    mediaPlayer!!.setDataSource(currentActivity!!.applicationContext, Uri.parse(path), headers)
++                    val contextForPlayer = hostActivity?.applicationContext ?: reactContext.applicationContext
++                    mediaPlayer!!.setDataSource(contextForPlayer, Uri.parse(path), headers)
+                 } else {
+                     mediaPlayer!!.setDataSource(path)
+                 }

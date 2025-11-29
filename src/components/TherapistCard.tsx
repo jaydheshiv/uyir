@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ProgressBar from '../components/ProgressBar';
 
 type TherapistCardProps = {
@@ -46,18 +46,22 @@ export default function TherapistCard({
         <Text style={styles.therapyAvailableLabel}>Available online via:</Text>
         <Text style={styles.therapyAvailable}>{availableVia}</Text>
       </View>
-      <ProgressBar progress={0.46} />
-      <View style={styles.paginationDots}>
-        {Array.from({ length: totalDots }).map((_, idx) => (
-          <View
-            key={idx}
-            style={[
-              styles.dot,
-              idx === activeDot && styles.dotActive,
-            ]}
-          />
-        ))}
-      </View>
+      {totalDots > 0 && (
+        <>
+          <ProgressBar progress={0.46} />
+          <View style={styles.paginationDots}>
+            {Array.from({ length: totalDots }).map((_, idx) => (
+              <View
+                key={idx}
+                style={[
+                  styles.dot,
+                  idx === activeDot && styles.dotActive,
+                ]}
+              />
+            ))}
+          </View>
+        </>
+      )}
     </View>
   );
 }
@@ -65,88 +69,88 @@ export default function TherapistCard({
 const styles = StyleSheet.create({
   therapistCard: {
     backgroundColor: '#E7E3FF',
-    borderRadius: 20,
-    marginTop: 2,
-    marginBottom: 20,
+    borderRadius: 18,
+    marginTop: 1.8,
+    marginBottom: 18,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOpacity: 0.10,
     shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 1.8 },
   },
   therapistCardTop: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 18,
-    paddingBottom: 9,
+    padding: 16.2,
+    paddingBottom: 8.1,
   },
   therapistImage: {
-    width: 90,
-    height: 90,
-    borderRadius: 20,
-    marginRight: 8,
+    width: 81,
+    height: 81,
+    borderRadius: 18,
+    marginRight: 7.2,
     backgroundColor: '#ccc',
   },
   therapistName: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '600',
     color: '#222',
-    marginBottom: 4,
+    marginBottom: 3.6,
     textAlign: 'left',
   },
   therapistExp: {
-    fontSize: 15,
+    fontSize: 13.5,
     color: '#222',
-    marginBottom: 2,
+    marginBottom: 1.8,
     textAlign: 'left',
   },
   therapistPrice: {
-    fontSize: 14,
+    fontSize: 12.6,
     color: '#222',
     fontWeight: '500',
-    marginBottom: 12,
+    marginBottom: 10.8,
     textAlign: 'left',
   },
   profileButton: {
     borderWidth: 1,
     borderColor: '#6C5CE7',
-    borderRadius: 10,
-    paddingVertical: 6,
-    paddingHorizontal: 20,
+    borderRadius: 9,
+    paddingVertical: 5.4,
+    paddingHorizontal: 18,
     alignSelf: 'flex-start',
   },
   profileButtonText: {
     color: '#6C5CE7',
-    fontSize: 16,
+    fontSize: 14.4,
     fontWeight: '500',
   },
   therapyInfo: {
     backgroundColor: '#fff',
     opacity: 0.85,
-    padding: 16,
-    paddingTop: 10,
-    paddingBottom: 20,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    padding: 14.4,
+    paddingTop: 9,
+    paddingBottom: 18,
+    borderBottomLeftRadius: 18,
+    borderBottomRightRadius: 18,
   },
   therapyTitle: {
-    fontSize: 16,
+    fontSize: 14.4,
     fontWeight: '600',
     color: '#222',
-    marginBottom: 2,
+    marginBottom: 1.8,
   },
   therapyDesc: {
-    fontSize: 13,
+    fontSize: 11.7,
     color: '#888',
-    marginBottom: 18,
+    marginBottom: 16.2,
   },
   therapyAvailableLabel: {
-    fontSize: 12,
+    fontSize: 10.8,
     color: '#888',
-    marginBottom: 2,
+    marginBottom: 1.8,
   },
   therapyAvailable: {
-    fontSize: 15,
+    fontSize: 13.5,
     fontWeight: '600',
     color: '#222',
   },
@@ -154,15 +158,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 9,
     backgroundColor: 'transparent',
   },
   dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 7.2,
+    height: 7.2,
+    borderRadius: 3.6,
     backgroundColor: '#fff',
-    marginHorizontal: 4,
+    marginHorizontal: 3.6,
   },
   dotActive: {
     backgroundColor: '#6C5CE7',
